@@ -5,6 +5,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
+#![recursion_limit="1024"]
 
 
 ///! To get started:-
@@ -14,7 +15,7 @@
 ///! let agent: AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();
 ///! Look up a feature's details:-
 ///! let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();
-
+///! Use the constants in `RegionalUsage` to get regional usage data.
 
 extern crate chrono;
 #[macro_use] extern crate lazy_static;
