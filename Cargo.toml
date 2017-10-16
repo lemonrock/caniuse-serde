@@ -13,9 +13,9 @@ documentation = "https://github.com/lemonrock/caniuse-serde/blob/master/README.m
 homepage = "https://github.com/lemonrock/caniuse-serde"
 repository = "https://github.com/lemonrock/caniuse-serde.git"
 exclude = ["*"]
-include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml", "lib/caniuse/data.json"]
+include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "src/**/*.json", "Cargo.toml", "rustfmt.toml", "clippy.toml"]
 readme = "README.md"
-publish = false
+publish = true
 version = "0.0.0"
 
 [profile.release]
