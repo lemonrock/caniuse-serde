@@ -1,0 +1,6 @@
+[submodule ".cargo"]
+	path = .cargo
+	url = https://github.com/lemonrock/.cargo.git
+[submodule "lib/caniuse"]
+	path = lib/caniuse
+	url = https://github.com/Fyrd/caniuse.git

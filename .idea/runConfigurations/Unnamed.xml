@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Unnamed" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="channel" value="STABLE" />
+    <option name="command" value="check" />
+    <option name="nocapture" value="true" />
+    <option name="backtrace" value="SHORT" />
+    <envs />
+    <method />
+  </configuration>
+</component>

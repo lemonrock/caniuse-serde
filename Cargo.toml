@@ -1,0 +1,37 @@
+# This file is part of caniuse-serde. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT. No part of caniuse-serde, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
+
+
+[package]
+name = "caniuse-serde"
+description = "A more modern wrapping for parsing and querying the caniuse.com JSON database using Serde 1.0"
+keywords = ["html", "css", "caniuse", "serde"]
+categories = ["database", "web-programming", "api-bindings"]
+license = "MIT"
+authors = ["Raphael Cohn <raphael.cohn@stormmq.com>"]
+documentation = "https://github.com/lemonrock/caniuse-serde/blob/master/README.md"
+homepage = "https://github.com/lemonrock/caniuse-serde"
+repository = "https://github.com/lemonrock/caniuse-serde.git"
+exclude = ["*"]
+include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "Cargo.toml", "rustfmt.toml", "clippy.toml", "lib/caniuse/data.json"]
+readme = "README.md"
+publish = false
+version = "0.0.0"
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+lazy_static = "0.2"
+linked-hash-map = { version = "0.4.1", features = ["serde_impl"] }
+serde_derive = "^1.0.8"
+serde_json = { version = "^1.0.4", features = ["preserve_order"] }
+serde = "^1.0.8"
+url = "1.5.1"
+url_serde = "0.2.0"
