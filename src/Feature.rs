@@ -65,10 +65,21 @@ impl<'a> Feature<'a>
 		&self.featureDetail.notes
 	}
 	
+	/// implementations; returns None if agentName has no known usages
 	#[inline(always)]
-	pub fn one_based_numbered_note(&self, one_based_index: u8) -> Option<&'a str>
+	pub fn implementations_by_agents(&self, agentName: &AgentName, lowerBound: Bound<&Version>, upperBound: Bound<&Version>) -> Option<Range<Version, SupportDetail>>
 	{
-		self.featureDetail.notes_by_num.get(&one_based_index).map(|value| value.as_str())
+		match self.featureDetail.implementations_by_agents.get(agentName)
+		{
+			None => None,
+			Some(entry) => Some(entry.range((lowerBound, upperBound)))
+		}
+	}
+	
+	#[inline(always)]
+	pub fn usage(&self) -> (UsagePercentage, UsagePercentage)
+	{
+		(self.featureDetail.usage_y, self.featureDetail.usage_a)
 	}
 	
 	#[inline(always)]

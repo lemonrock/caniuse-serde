@@ -9,9 +9,9 @@ pub struct AgentDetail
 	#[serde(rename = "abbr")] abbreviated_name: String,
 	prefix: Prefix,
 	#[serde(rename = "type")] agentType: AgentType,
-	usage_global: HashMap<VersionRange, f64>,
-	#[serde(rename = "versions")] eras_to_versions: Vec<Option<VersionRange>>,
-	#[serde(default)] prefix_exceptions: HashMap<VersionRange, Prefix>
+	usage_global: HashMap<Version, f64>,
+	#[serde(rename = "versions")] eras_to_versions: Vec<Option<Version>>,
+	#[serde(default)] prefix_exceptions: HashMap<Version, Prefix>
 }
 
 impl AgentDetail
@@ -35,7 +35,7 @@ impl AgentDetail
 	}
 	
 	#[inline(always)]
-	pub fn prefix<'a>(&'a self, version: &VersionRange) -> &'a Prefix
+	pub fn prefix<'a>(&'a self, version: &Version) -> &'a Prefix
 	{
 		match self.prefix_exceptions.get(version)
 		{
@@ -46,14 +46,14 @@ impl AgentDetail
 	
 	/// Multiply by 100 to get a percentage
 	#[inline(always)]
-	pub fn globalUsageFraction(&self, version: &VersionRange) -> Option<f64>
+	pub fn globalUsageFraction(&self, version: &Version) -> Option<f64>
 	{
 		self.usage_global.get(version).map(|value| *value)
 	}
 	
 	/// versions to eras; not super useful as eras aren't tied to dates, so to say 'e0' doesn't really define a point in time
 	#[inline(always)]
-	pub fn versionNearestToEra<'a>(&'a self, eras: &Eras, eraName: &EraName) -> Option<&'a VersionRange>
+	pub fn versionNearestToEra<'a>(&'a self, eras: &Eras, eraName: &EraName) -> Option<&'a Version>
 	{
 		let mut index = match eras.index(eraName)
 		{

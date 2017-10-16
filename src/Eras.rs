@@ -3,7 +3,7 @@
 
 
 #[derive(Debug, Clone)]
-pub struct Eras(LinkedHashMap<EraName, (usize, String)>);
+pub struct Eras(BTreeMap<EraName, (usize, String)>);
 
 impl<'de> Deserialize<'de> for Eras
 {
@@ -24,7 +24,7 @@ impl<'de> Deserialize<'de> for Eras
 			#[inline(always)]
 			fn visit_map<M: MapAccess<'de>>(self, mut access: M) -> Result<Self::Value, M::Error>
 			{
-				let mut map = LinkedHashMap::with_capacity(access.size_hint().unwrap_or(16));
+				let mut map = BTreeMap::new();
 				
 				let mut index = 0;
 				while let Some((key, value)) = access.next_entry()?
@@ -53,5 +53,30 @@ impl Eras
 	fn description(&self, eraName: &EraName) -> Option<&str>
 	{
 		self.0.get(eraName).map(|era| era.1.as_str())
+	}
+	
+	#[inline(always)]
+	fn oldest(&self) -> Option<&EraName>
+	{
+		self.0.keys().next()
+	}
+	
+	#[inline(always)]
+	fn youngest(&self) -> Option<&EraName>
+	{
+		self.0.keys().rev().next()
+	}
+	
+	#[inline(always)]
+	fn has(&self, eraName: EraName) -> Option<EraName>
+	{
+		if self.0.contains_key(&eraName)
+		{
+			Some(eraName)
+		}
+		else
+		{
+			None
+		}
 	}
 }

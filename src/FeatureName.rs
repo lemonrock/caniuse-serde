@@ -3,7 +3,7 @@
 
 
 #[derive(Deserialize, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct FeatureName(pub String);
+pub struct FeatureName(String);
 
 impl<I: Into<String>> From<I> for FeatureName
 {
@@ -22,6 +22,17 @@ impl FromStr for FeatureName
 	fn from_str(s: &str) -> Result<Self, Self::Err>
 	{
 		Ok(FeatureName(s.to_owned()))
+	}
+}
+
+impl Deref for FeatureName
+{
+	type Target = str;
+	
+	#[inline(always)]
+	fn deref(&self) -> &Self::Target
+	{
+		&self.0
 	}
 }
 

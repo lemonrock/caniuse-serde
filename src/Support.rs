@@ -2,136 +2,48 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
-#[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct Support
+#[derive(Debug, Clone)]
+pub struct Support<'a>
 {
-	maturity: SupportMaturity,
-	requiresPrefix: bool,
-	disabledByDefault: bool,
-	notes: Vec<u8>,
+	agentName: &'a AgentName,
+	versionRange: &'a Version,
+	supportDetail: &'a SupportDetail,
+	notes_by_num: &'a BTreeMap<u8, String>,
 }
 
-impl<'de> Deserialize<'de> for Support
+impl<'a> Support<'a>
 {
 	#[inline(always)]
-	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
+	pub fn maturity(&self) -> SupportMaturity
 	{
-		struct SupportVisitor;
+		self.supportDetail.maturity()
+	}
+	
+	#[inline(always)]
+	pub fn requires_prefix(&self) -> bool
+	{
+		self.supportDetail.requiresPrefix()
+	}
+	
+	#[inline(always)]
+	pub fn disabled_by_default(&self) -> bool
+	{
+		self.supportDetail.disabledByDefault()
+	}
+	
+	/// A list of note pairs of number (which is one-based; the returned Vec is zero-based) and string
+	#[inline(always)]
+	pub fn notes(&'a self) -> Vec<(u8, &'a str)>
+	{
+		let noteNumbers = self.supportDetail.oneBasedNoteNumbers();
+		let mut notes = Vec::with_capacity(noteNumbers.len());
 		
-		impl<'de> Visitor<'de> for SupportVisitor
+		for oneBasedNoteNumber in noteNumbers
 		{
-			type Value = Support;
-			
-			#[inline(always)]
-			fn expecting(&self, formatter: &mut Formatter) -> fmt::Result
-			{
-				formatter.write_str("a string which contains comma separated sub-strings")
-			}
-			
-			#[inline(always)]
-			fn visit_str<E: de::Error>(self, v: &str) -> Result<Self::Value, E>
-			{
-				#[inline(always)]
-				fn parseNoteAndSubsequentNotes<'a, I: Iterator<Item=&'a str>, E: de::Error>(mut support: Support, potentialNote: &str, mut potentialNotes: I) -> Result<Support, E>
-				{
-					let mut potentialNote = Some(potentialNote);
-					
-					while potentialNote.is_some()
-					{
-						let note = potentialNote.unwrap();
-						if note.starts_with('#')
-						{
-							match (&note[1..]).parse::<u8>()
-							{
-								Err(parseError) => return Err(E::custom(parseError)),
-								Ok(oneBasedNoteNumber) =>
-								{
-									support.notes.push(oneBasedNoteNumber);
-								}
-							}
-						}
-						else
-						{
-							return Err(E::custom("Expected a note that started with a '#'"));
-						}
-						potentialNote = potentialNotes.next()
-					}
-					
-					Ok(support)
-				}
-				
-				if v.is_empty()
-				{
-					return Err(E::custom("can not be empty"));
-				}
-				
-				use self::SupportMaturity::*;
-				
-				let mut items = v.split(' ');
-				let maturity = match items.next()
-				{
-					None => return Err(E::custom("must have first item")),
-					Some(first) => match first
-					{
-						"y" => SupportedByDefault,
-						"a" => AlmostSupported,
-						"n" => NotSupportedOrDisabledByDefault,
-						"p" => SupportedUsingAPolyfill,
-						"u" => SupportUnknown,
-						
-						_ => return Err(E::custom("there can only be 'y', 'a', 'n', 'p' or 'u' starting stats")),
-					}
-				};
-				
-				let mut support = Support
-				{
-					maturity,
-					requiresPrefix: false,
-					disabledByDefault: false,
-					notes: Vec::with_capacity(0),
-				};
-				
-				match items.next()
-				{
-					None => return Ok(support),
-					Some(value) => match value
-					{
-						"x" =>
-						{
-							support.requiresPrefix = true;
-						}
-						
-						"d" =>
-						{
-							support.disabledByDefault = true;
-						}
-						
-						_ => return parseNoteAndSubsequentNotes(support, value, items),
-					}
-				}
-				
-				match items.next()
-				{
-					None => return Ok(support),
-					Some(value) => match value
-					{
-						"d" =>
-						{
-							support.disabledByDefault = true;
-						}
-						
-						_ => return parseNoteAndSubsequentNotes(support, value, items),
-					}
-				}
-				
-				match items.next()
-				{
-					None => Ok(support),
-					Some(value) => parseNoteAndSubsequentNotes(support, value, items)
-				}
-			}
+			let noteString = self.notes_by_num.get(oneBasedNoteNumber).expect("Invalid caniuse.com database - note numbers do not tally").as_str();
+			notes.push((*oneBasedNoteNumber, noteString))
 		}
 		
-		deserializer.deserialize_str(SupportVisitor)
+		notes
 	}
 }

@@ -43,20 +43,34 @@ impl<'de> Deserialize<'de> for EraName
 
 impl EraName
 {
-	pub const PreviousTwo: EraName = EraName(-2);
-	
-	pub const Previous: EraName = EraName(-1);
-	
-	pub const Current: EraName = EraName(0);
-	
-	pub const Next: EraName = EraName(1);
-	
-	pub const NextTwo: EraName = EraName(2);
+	#[inline(always)]
+	pub fn oldest<'a>(canIUse: &'a CanIUse) -> Self
+	{
+		canIUse.eras.oldest().expect("there ought to be at least one era").clone()
+	}
 	
 	#[inline(always)]
-	pub fn older(&self) -> Self
+	pub fn current<'a>(canIUse: &'a CanIUse) -> Self
 	{
-		EraName(self.0 - 1)
+		canIUse.eras.has(EraName(0)).expect("there ought to be at a current era")
+	}
+	
+	#[inline(always)]
+	pub fn youngest<'a>(canIUse: &'a CanIUse) -> Self
+	{
+		canIUse.eras.youngest().expect("there ought to be at least one era").clone()
+	}
+	
+	#[inline(always)]
+	pub fn older<'a>(&self, canIUse: &'a CanIUse) -> Option<Self>
+	{
+		canIUse.eras.has(EraName(self.0 - 1))
+	}
+	
+	#[inline(always)]
+	pub fn younger<'a>(&self, canIUse: &'a CanIUse) -> Option<Self>
+	{
+		canIUse.eras.has(EraName(self.0 + 1))
 	}
 	
 	#[inline(always)]

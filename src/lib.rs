@@ -18,7 +18,6 @@
 
 extern crate chrono;
 #[macro_use] extern crate lazy_static;
-extern crate linked_hash_map;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate serde_json;
@@ -27,7 +26,6 @@ extern crate url_serde;
 
 
 use ::chrono::prelude::*;
-use ::linked_hash_map::LinkedHashMap;
 use ::serde::de;
 use ::serde::de::Deserialize;
 use ::serde::de::Deserializer;
@@ -35,6 +33,8 @@ use ::serde::de::MapAccess;
 use ::serde::de::Visitor;
 use ::std::collections::BTreeMap;
 use ::std::collections::HashMap;
+use ::std::collections::btree_map::Range;
+use ::std::collections::Bound;
 use ::std::cmp::Ordering;
 use ::std::cmp::Eq;
 use ::std::cmp::Ord;
@@ -77,8 +77,11 @@ include!("FeatureName.rs");
 include!("Link.rs");
 include!("ParentCategory.rs");
 include!("Prefix.rs");
+include!("RegionalUsage.rs");
 include!("Status.rs");
 include!("Support.rs");
+include!("SupportDetail.rs");
 include!("SupportMaturity.rs");
 include!("UsagePercentage.rs");
-include!("VersionRange.rs");
+include!("Version.rs");
+include!("VersionPart.rs");

@@ -40,21 +40,21 @@ impl<'a> Agent<'a>
 	/// prefix to use for this particular version (lacks leading and trailing dash)
 	/// varies per version only for legacy Opera using the Presto rendering engine (from -webkit- to -o-)
 	#[inline(always)]
-	pub fn prefix(&self, version: &VersionRange) -> &'a Prefix
+	pub fn prefix(&self, version: &Version) -> &'a Prefix
 	{
 		self.agentDetail.prefix(version)
 	}
 	
 	/// Multiply by 100 to get a percentage
 	#[inline(always)]
-	pub fn globalUsageFraction(&self, version: &VersionRange) -> Option<f64>
+	pub fn globalUsageFraction(&self, version: &Version) -> Option<f64>
 	{
 		self.agentDetail.globalUsageFraction(version)
 	}
 	
 	/// versions to eras; not super useful as eras aren't tied to dates, so to say 'e0' doesn't really define a point in time
 	#[inline(always)]
-	pub fn versionNearestToEra(&self, eraName: &EraName) -> Option<&'a VersionRange>
+	pub fn versionNearestToEra(&self, eraName: &EraName) -> Option<&'a Version>
 	{
 		self.agentDetail.versionNearestToEra(self.eras, eraName)
 	}

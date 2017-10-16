@@ -12,7 +12,7 @@ pub struct FeatureDetail
 	#[serde(default)] links: Vec<Link>,
 	#[serde(default)] bugs: Vec<Bug>,
 	#[serde(default)] categories: Vec<Category>,
-	#[serde(default, rename = "stats")] implementations_by_agents: HashMap<AgentName, HashMap<VersionRange, Support>>,
+	#[serde(default, rename = "stats")] implementations_by_agents: HashMap<AgentName, BTreeMap<Version, SupportDetail>>,
 	#[serde(default)] notes: String,
 	#[serde(default)] notes_by_num: BTreeMap<u8, String>,
 	#[serde(default, deserialize_with = "FeatureDetail::deserialize_parent")] parent: Option<FeatureName>,
