@@ -3,19 +3,10 @@
 
 
 use super::CanIUse;
-use ::serde_json;
-use ::std::fs::File;
-use ::std::path::Path;
 
 
 #[test]
-fn distance_test()
+fn test()
 {
-	// Open the file in read-only mode.
-	let file = File::open(path)?;
-	
-	// Read the JSON contents of the file as an instance of `User`.
-	let u = serde_json::from_reader(file)?;
-	
-	let canIUse: CanIUse = serde_json::from_str("hello world").expect("Could not deserialize Can I Use JSON data");
+	CanIUse::default();
 }
