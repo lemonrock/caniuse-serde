@@ -86,7 +86,9 @@
       <w>nack</w>
       <w>nbyte</w>
       <w>nelems</w>
+      <w>newtype</w>
       <w>nonblock</w>
+      <w>nonexhaustive</w>
       <w>nonoverlapping</w>
       <w>nvml</w>
       <w>oflags</w>

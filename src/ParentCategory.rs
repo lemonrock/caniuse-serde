@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// A ParentCategory is used in the caniuse.com UI. It is of limited use otherwise.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum ParentCategory
 {
@@ -13,11 +14,15 @@ pub enum ParentCategory
 	Security,
 	SVG,
 	
+	#[doc(hidden)] __Nonexhaustive,
+	
+	/// A parent category that did not exist in the caniuse.com data when this library was created
 	Unknown(String),
 }
 
 impl Default for ParentCategory
 {
+	/// Defaults to ParentCategory::Other
 	#[inline(always)]
 	fn default() -> Self
 	{
@@ -27,6 +32,7 @@ impl Default for ParentCategory
 
 impl<'de> Deserialize<'de> for ParentCategory
 {
+	/// Deserialize using Serde
 	#[inline(always)]
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
@@ -89,9 +95,11 @@ impl<'de> Deserialize<'de> for ParentCategory
 
 impl ParentCategory
 {
+	/// A list of one or more categories scoped by this parent category. Of limited use outside of the caniuse.com UI.
+	/// Only optional if the discriminant is ParentCategory::Unknown or the caniuse.com database is broken in some way.
 	#[inline(always)]
 	pub fn children<'a>(&self, canIUse: &'a CanIUse) -> Option<&'a [Category]>
 	{
-		canIUse.childCategories(self)
+		canIUse.child_categories(self)
 	}
 }

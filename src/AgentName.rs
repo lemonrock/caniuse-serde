@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// The name of this agent
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum AgentName
 {
@@ -24,11 +25,15 @@ pub enum AgentName
 	QqBrowserAndroid,
 	BaiduBrowserAndroid,
 	
+	#[doc(hidden)] __Nonexhaustive,
+	
+	/// An agent that did not exist in the caniuse.com data when this library was created
 	Unknown(String),
 }
 
 impl Default for AgentName
 {
+	/// Defaults to AgentName::GoogleChrome, the comments user agent
 	#[inline(always)]
 	fn default() -> Self
 	{
@@ -38,6 +43,7 @@ impl Default for AgentName
 
 impl<'de> Deserialize<'de> for AgentName
 {
+	/// Deserialize using Serde
 	#[inline(always)]
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
@@ -122,6 +128,8 @@ impl<'de> Deserialize<'de> for AgentName
 
 impl AgentName
 {
+	/// Given an agent name and the CanIUse database, find the associated agent.
+	/// Returns None if this agent is not defined (this is typically either due to a typo or different versions of the caniuse.com database).
 	#[inline(always)]
 	pub fn agent<'a>(&'a self, canIUse: &'a CanIUse) -> Option<Agent<'a>>
 	{

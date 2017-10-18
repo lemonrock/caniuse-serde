@@ -3,16 +3,17 @@
 
 
 #[derive(Default, Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct SupportDetail
+struct SupportDetail
 {
 	maturity: SupportMaturity,
-	requiresPrefix: bool,
-	disabledByDefault: bool,
-	notes: Vec<u8>,
+	requires_prefix: bool,
+	disabled_by_default: bool,
+	notes_by_one_based_number: Vec<u8>,
 }
 
 impl<'de> Deserialize<'de> for SupportDetail
 {
+	/// Deserialize using Serde
 	#[inline(always)]
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
@@ -46,7 +47,7 @@ impl<'de> Deserialize<'de> for SupportDetail
 								Err(parseError) => return Err(E::custom(parseError)),
 								Ok(oneBasedNoteNumber) =>
 								{
-									support.notes.push(oneBasedNoteNumber);
+									support.notes_by_one_based_number.push(oneBasedNoteNumber);
 								}
 							}
 						}
@@ -86,9 +87,9 @@ impl<'de> Deserialize<'de> for SupportDetail
 				let mut support = SupportDetail
 				{
 					maturity,
-					requiresPrefix: false,
-					disabledByDefault: false,
-					notes: Vec::with_capacity(0),
+					requires_prefix: false,
+					disabled_by_default: false,
+					notes_by_one_based_number: Vec::with_capacity(0),
 				};
 				
 				match items.next()
@@ -98,12 +99,12 @@ impl<'de> Deserialize<'de> for SupportDetail
 					{
 						"x" =>
 						{
-							support.requiresPrefix = true;
+							support.requires_prefix = true;
 						}
 						
 						"d" =>
 						{
-							support.disabledByDefault = true;
+							support.disabled_by_default = true;
 						}
 						
 						_ => return parseNoteAndSubsequentNotes(support, value, items),
@@ -117,7 +118,7 @@ impl<'de> Deserialize<'de> for SupportDetail
 					{
 						"d" =>
 						{
-							support.disabledByDefault = true;
+							support.disabled_by_default = true;
 						}
 						
 						_ => return parseNoteAndSubsequentNotes(support, value, items),
@@ -145,20 +146,28 @@ impl SupportDetail
 	}
 	
 	#[inline(always)]
-	fn requiresPrefix(&self) -> bool
+	fn requires_prefix(&self) -> bool
 	{
-		self.requiresPrefix
+		self.requires_prefix
 	}
 	
 	#[inline(always)]
-	fn disabledByDefault(&self) -> bool
+	fn disabled_by_default(&self) -> bool
 	{
-		self.disabledByDefault
+		self.disabled_by_default
 	}
 	
 	#[inline(always)]
-	fn oneBasedNoteNumbers(&self) -> &[u8]
+	fn notes<'a>(&'a self, feature: &'a Feature) -> Vec<(u8, &'a str)>
 	{
-		&self.notes[..]
+		let mut result = Vec::with_capacity(self.notes_by_one_based_number.len());
+		
+		for note_number in self.notes_by_one_based_number.iter()
+		{
+			let noteText = feature.feature_detail.notes_by_one_based_number.get(note_number).expect("Invalid caniuse.com database").as_str();
+			result.push((*note_number, noteText));
+		}
+		
+		result
 	}
 }

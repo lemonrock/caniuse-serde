@@ -2,11 +2,14 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// An Era is a caniuse.com concept for trying to line-up different browsers across time.
+/// On its own, it is not very useful.
 #[derive(Debug, Clone)]
 pub struct Eras(BTreeMap<EraName, (usize, String)>);
 
 impl<'de> Deserialize<'de> for Eras
 {
+	/// Deserialize using Serde
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
 		struct ErasVisitor;

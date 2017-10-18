@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// A Status reflects the 'standardisation' of a feature
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Status
 {
@@ -13,11 +14,15 @@ pub enum Status
 	Other,
 	UnofficialOrNote,
 	
+	#[doc(hidden)] __Nonexhaustive,
+	
+	/// A status that did not exist in the caniuse.com data when this library was created
 	Unknown(String),
 }
 
 impl Default for Status
 {
+	/// Defaults to Status::Other
 	#[inline(always)]
 	fn default() -> Self
 	{
@@ -27,6 +32,7 @@ impl Default for Status
 
 impl<'de> Deserialize<'de> for Status
 {
+	/// Deserialize using Serde
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
 		struct StatusVisitor;
@@ -85,9 +91,11 @@ impl<'de> Deserialize<'de> for Status
 
 impl Status
 {
+	/// A short piece of text describing this status.
+	/// Only optional if the discriminant is Status::Unknown or the caniuse.com database is broken in some way.
 	#[inline(always)]
 	pub fn description<'a>(&self, canIUse: &'a CanIUse) -> Option<&'a str>
 	{
-		canIUse.statusDescription(self)
+		canIUse.status_description(self)
 	}
 }

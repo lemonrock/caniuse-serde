@@ -2,14 +2,15 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
-/// Actually, a version range. For example, Opera allows hyphenated versions eg "10.0-10.1"
-/// Safari also has "TP" for its latest version, which is not stable across time
-/// Version "3" and "3.0" are not considered equal; "3.0" is greater than "3"
+/// Version "3" and "3.0" are not considered equal; "3.0" is greater than "3".
+/// The legacy Opera (Presto) version strings "9.5-9.6" and "10.0-10.1" are converted to 9.5 and 10.0.
+/// Safari also has "TP" for its latest version, which is not stable across time and is converted to the VersionPart::TechnologyPreview.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Version(VersionPart, Vec<VersionPart>);
 
 impl<'de> Deserialize<'de> for Version
 {
+	/// Deserialize using Serde
 	#[inline(always)]
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
@@ -38,6 +39,8 @@ impl<'de> Deserialize<'de> for Version
 
 impl<'a, I: Into<&'a str>> From<I> for Version
 {
+	/// Converts into a Version anything that can be converted into '&str'.
+	/// Use with `into()`.
 	#[inline(always)]
 	fn from(value: I) -> Self
 	{
@@ -49,6 +52,8 @@ impl FromStr for Version
 {
 	type Err = ();
 	
+	/// Converts into a Version anything from '&str'.
+	/// Use with `parse()`.
 	#[inline(always)]
 	fn from_str(s: &str) -> Result<Self, Self::Err>
 	{
@@ -58,6 +63,7 @@ impl FromStr for Version
 
 impl Version
 {
+	/// Special method to construct a version representing the Opera (Presto) 9.5-9.6 range
 	#[inline(always)]
 	pub fn opera9Dot5Or9Dot6() -> Version
 	{
@@ -65,6 +71,7 @@ impl Version
 		Version(Number(9), vec![Number(5)])
 	}
 	
+	/// Special method to construct a version representing the Opera (Presto) 10.0-10.1 range
 	#[inline(always)]
 	pub fn opera10Dot0Or10Dot1() -> Version
 	{
@@ -72,12 +79,14 @@ impl Version
 		Version(Number(10), vec![Number(0)])
 	}
 	
+	/// Special method to construct a version representing the Safari TP version
 	#[inline(always)]
 	pub fn safariTechnologyPreview() -> Version
 	{
 		Version(VersionPart::TechnologyPreview, vec![])
 	}
 	
+	/// Is this version the Safari Technology Preview?
 	#[inline(always)]
 	pub fn is_safari_technology_preview(&self) -> bool
 	{
@@ -88,12 +97,14 @@ impl Version
 		}
 	}
 	
+	/// Is this version "0" (sometimes found in caniuse.com's Regional data) or Unknown
 	#[inline(always)]
-	pub fn is_invalid(&self) -> bool
+	pub fn is_invalid_or_unknown(&self) -> bool
 	{
 		match self.0
 		{
 			VersionPart::Number(0) => true,
+			VersionPart::Unknown(_) => true,
 			_ => false,
 		}
 	}

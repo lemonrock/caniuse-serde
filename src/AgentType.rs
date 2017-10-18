@@ -2,9 +2,13 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// Represents whether an agent is used primarily of the desktop or a mobile device
 #[derive(Deserialize, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum AgentType
 {
+	/// This agent is used on the desktop
 	desktop,
+	
+	/// This agent is used on mobile devices,
 	mobile,
 }

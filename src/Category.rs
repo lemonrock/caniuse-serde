@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// One or more categories are associated with each Feature
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Category
 {
@@ -18,11 +19,15 @@ pub enum Category
 	JS,
 	Security,
 	
+	#[doc(hidden)] __Nonexhaustive,
+	
+	/// A category that did not exist in the caniuse.com data when this library was created
 	Unknown(String),
 }
 
 impl Default for Category
 {
+	/// Defaults to Category::Other
 	#[inline(always)]
 	fn default() -> Self
 	{
@@ -32,6 +37,7 @@ impl Default for Category
 
 impl<'de> Deserialize<'de> for Category
 {
+	/// Deserialize using Serde
 	#[inline(always)]
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{

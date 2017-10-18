@@ -2,11 +2,14 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// An EraName is a caniuse.com concept for modelling past, current and future browsers with a similar version.
+/// Not all browsers belong to any particular Era. Particularly so for older versions of Internet Explorer, which has had very few releases.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct EraName(i64);
 
 impl<'de> Deserialize<'de> for EraName
 {
+	/// Deserialize using Serde
 	#[inline(always)]
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
@@ -43,36 +46,47 @@ impl<'de> Deserialize<'de> for EraName
 
 impl EraName
 {
+	/// Returns the oldest known Era
+	/// Panics if the CanIUse database has no Eras; this should not be possible unless you're crafting your own input JSON.
 	#[inline(always)]
 	pub fn oldest<'a>(canIUse: &'a CanIUse) -> Self
 	{
 		canIUse.eras.oldest().expect("there ought to be at least one era").clone()
 	}
 	
+	/// Returns the current Era
+	/// Panics if the CanIUse database is missing the current Era; this should not be possible unless you're crafting your own input JSON.
 	#[inline(always)]
 	pub fn current<'a>(canIUse: &'a CanIUse) -> Self
 	{
 		canIUse.eras.has(EraName(0)).expect("there ought to be at a current era")
 	}
 	
+	/// Returns the youngest known Era; typically this is also that associated with Safari's Technology Preview so it is not normally an useful concept.
+	/// Panics if the CanIUse database has no Eras; this should not be possible unless you're crafting your own input JSON.
 	#[inline(always)]
 	pub fn youngest<'a>(canIUse: &'a CanIUse) -> Self
 	{
 		canIUse.eras.youngest().expect("there ought to be at least one era").clone()
 	}
 	
+	/// Returns an Era immediately older that this one.
+	/// Returns None if this is the oldest era.
 	#[inline(always)]
 	pub fn older<'a>(&self, canIUse: &'a CanIUse) -> Option<Self>
 	{
 		canIUse.eras.has(EraName(self.0 - 1))
 	}
 	
+	/// Returns an Era immediately younger that this one.
+	/// Returns None if this is the youngest era.
 	#[inline(always)]
 	pub fn younger<'a>(&self, canIUse: &'a CanIUse) -> Option<Self>
 	{
 		canIUse.eras.has(EraName(self.0 + 1))
 	}
 	
+	/// Returns a description of this Era, typically for an UI.
 	#[inline(always)]
 	pub fn description<'a>(&self, canIUse: &'a CanIUse) -> Option<&'a str>
 	{

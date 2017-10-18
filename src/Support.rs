@@ -2,48 +2,41 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
-#[derive(Debug, Clone)]
+/// Represents details of support
 pub struct Support<'a>
 {
-	agentName: &'a AgentName,
-	versionRange: &'a Version,
-	supportDetail: &'a SupportDetail,
-	notes_by_num: &'a BTreeMap<u8, String>,
+	support_detail: &'a SupportDetail,
+	feature: &'a Feature<'a>,
 }
 
 impl<'a> Support<'a>
 {
+	/// How mature is support?
 	#[inline(always)]
 	pub fn maturity(&self) -> SupportMaturity
 	{
-		self.supportDetail.maturity()
+		self.support_detail.maturity()
 	}
 	
+	/// Does support require a prefix?
 	#[inline(always)]
 	pub fn requires_prefix(&self) -> bool
 	{
-		self.supportDetail.requiresPrefix()
+		self.support_detail.requires_prefix()
 	}
 	
+	/// Is support behind a flag or some other mechanism that isn't normally enabled in a default install?
 	#[inline(always)]
 	pub fn disabled_by_default(&self) -> bool
 	{
-		self.supportDetail.disabledByDefault()
+		self.support_detail.disabled_by_default()
 	}
 	
-	/// A list of note pairs of number (which is one-based; the returned Vec is zero-based) and string
+	/// Returns a list of pairs of one-based note numbers (the list itself is zero-based) and note text
+	/// Panics if the feature does not contain the note number; this is only possible if the caniuse.com database is invalid or the wrong Feature is passed
 	#[inline(always)]
 	pub fn notes(&'a self) -> Vec<(u8, &'a str)>
 	{
-		let noteNumbers = self.supportDetail.oneBasedNoteNumbers();
-		let mut notes = Vec::with_capacity(noteNumbers.len());
-		
-		for oneBasedNoteNumber in noteNumbers
-		{
-			let noteString = self.notes_by_num.get(oneBasedNoteNumber).expect("Invalid caniuse.com database - note numbers do not tally").as_str();
-			notes.push((*oneBasedNoteNumber, noteString))
-		}
-		
-		notes
+		self.support_detail.notes(self.feature)
 	}
 }

@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// The prefix put before at-rules, property names and property values
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Prefix
 {
@@ -17,11 +18,13 @@ pub enum Prefix
 	/// -ms- prefix.
 	ms,
 	
+	/// A prefix that did not exist in the caniuse.com data when this library was created
 	Unknown(String),
 }
 
 impl Default for Prefix
 {
+	/// Defaults to Prefix::webkit, the commonest prefix
 	#[inline(always)]
 	fn default() -> Self
 	{
@@ -31,6 +34,7 @@ impl Default for Prefix
 
 impl<'de> Deserialize<'de> for Prefix
 {
+	/// Deserialize using Serde
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
 		struct PrefixVisitor;

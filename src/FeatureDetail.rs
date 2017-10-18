@@ -3,7 +3,7 @@
 
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct FeatureDetail
+struct FeatureDetail
 {
 	#[serde(default)] title: String,
 	#[serde(default)] description: String,
@@ -14,10 +14,10 @@ pub struct FeatureDetail
 	#[serde(default)] categories: Vec<Category>,
 	#[serde(default, rename = "stats")] implementations_by_agents: HashMap<AgentName, BTreeMap<Version, SupportDetail>>,
 	#[serde(default)] notes: String,
-	#[serde(default)] notes_by_num: BTreeMap<u8, String>,
+	#[serde(default, rename = "notes_by_num")] notes_by_one_based_number: BTreeMap<u8, String>,
 	#[serde(default, deserialize_with = "FeatureDetail::deserialize_parent")] parent: Option<FeatureName>,
-	#[serde(default, rename="usage_perc_y")] usage_y: UsagePercentage,
-	#[serde(default, rename="usage_perc_a")] usage_a: UsagePercentage,
+	#[serde(default, rename="usage_perc_y")] supported_by_default_usage: UsagePercentage,
+	#[serde(default, rename="usage_perc_a")] almost_supported_usage: UsagePercentage,
 	#[serde(default, rename="ucprefix")] upper_case_prefix: bool,
 	#[serde(default, deserialize_with = "FeatureDetail::deserialize_comma_separated_strings")] keywords: Vec<String>,
 	#[serde(default, deserialize_with = "FeatureDetail::deserialize_comma_separated_strings", rename="ie_id")] internet_explorer_feature_identifiers: Vec<String>,

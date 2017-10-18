@@ -2,6 +2,8 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// A database of data relating to caniuse.com
+/// Not used directly, but references should be passed to methods on AgentName, FeatureName, EraName, and, less usefully, Status and ParentCategory.
 #[derive(Deserialize, Debug, Clone)]
 pub struct CanIUse
 {
@@ -15,10 +17,11 @@ pub struct CanIUse
 
 impl Default for CanIUse
 {
+	/// Defaults to the up-to-date version of the caniuse.com database shipped embedded in this crate.
 	#[inline(always)]
 	fn default() -> Self
 	{
-		match CanIUse::RawStringData.parse()
+		match include_str!("data.json").parse()
 		{
 			Err(error) => panic!("Invalid data embedded: {}", error),
 			Ok(canIUse) => canIUse
@@ -30,6 +33,7 @@ impl FromStr for CanIUse
 {
 	type Err = ::serde_json::error::Error;
 	
+	/// Deserialize a CanIUse database from a UTF-8 string representing the contents of a `data.json` file.
 	#[inline(always)]
 	fn from_str(canIUseDatabaseJson: &str) -> Result<Self, Self::Err>
 	{
@@ -37,69 +41,65 @@ impl FromStr for CanIUse
 	}
 }
 
-lazy_static!
-{
-	/// The up-to-date version of the caniuse.com database shipped embedded in this crate
-   	pub static ref EmbeddedCanIUseDatabase: CanIUse = CanIUse::default();
-}
-
 impl CanIUse
 {
-	const RawStringData: &'static str = include_str!("data.json");
-	
+	/// Deserialize a CanIUse database from a file path to a `data.json` file.
 	#[inline(always)]
 	pub fn from_path<P: AsRef<Path>>(canIUseJsonDatabaseFilePath: P) -> Result<Self, Box<::std::error::Error>>
 	{
 		Self::from_reader(File::open(canIUseJsonDatabaseFilePath)?)
 	}
 	
+	/// Deserialize a CanIUse database from a readable stream of raw JSON bytes.
 	#[inline(always)]
 	pub fn from_reader<R: Read>(readerOfStreamOfCanIUseJsonBytes: R) -> Result<Self, Box<::std::error::Error>>
 	{
 		Ok(serde_json::from_reader(readerOfStreamOfCanIUseJsonBytes)?)
 	}
 	
+	/// Deserialize a CanIUse database from a slice of raw JSON bytes.
 	#[inline(always)]
 	pub fn from_slice(rawCanIUseJsonBytes: &[u8]) -> Result<Self, ::serde_json::error::Error>
 	{
 		Ok(serde_json::from_slice(rawCanIUseJsonBytes)?)
 	}
 	
+	/// A timestamp of when this particular database was last updated.
 	#[inline(always)]
-	pub fn lastUpdated(&self) -> DateTime<Utc>
+	pub fn last_updated(&self) -> DateTime<Utc>
 	{
 		self.updated
 	}
 	
 	#[inline(always)]
-	fn agent<'a>(&'a self, agentName: &'a AgentName) -> Option<Agent<'a>>
+	fn agent<'a>(&'a self, agent_name: &'a AgentName) -> Option<Agent<'a>>
 	{
-		self.agents.get(agentName).map(|agentDetail| Agent
+		self.agents.get(agent_name).map(|agent_detail| Agent
 		{
 			eras: &self.eras,
-			agentName,
-			agentDetail,
+			agent_name,
+			agent_detail,
 		})
 	}
 	
 	#[inline(always)]
-	fn feature<'a>(&'a self, featureName: &'a FeatureName) -> Option<Feature<'a>>
+	fn feature<'a>(&'a self, feature_name: &'a FeatureName) -> Option<Feature<'a>>
 	{
-		self.features.get(featureName).map(|featureDetail| Feature
+		self.features.get(feature_name).map(|feature_detail| Feature
 		{
-			featureName,
-			featureDetail,
+			feature_name,
+			feature_detail,
 		})
 	}
 	
 	#[inline(always)]
-	fn statusDescription<'a>(&'a self, statusName: &Status) -> Option<&'a str>
+	fn status_description<'a>(&'a self, statusName: &Status) -> Option<&'a str>
 	{
 		self.statuses.get(statusName).map(|value| value.as_str())
 	}
 	
 	#[inline(always)]
-	fn childCategories<'a>(&'a self, parentCategory: &ParentCategory) -> Option<&'a [Category]>
+	fn child_categories<'a>(&'a self, parentCategory: &ParentCategory) -> Option<&'a [Category]>
 	{
 		self.childCategories.get(parentCategory).map(|value| &value[..])
 	}
@@ -192,4 +192,10 @@ impl CanIUse
 		let utc = Utc;
 		Ok(utc.timestamp(time as i64, 0))
 	}
+}
+
+lazy_static!
+{
+	/// The up-to-date version of the caniuse.com database shipped embedded in this crate.
+   	pub static ref EmbeddedCanIUseDatabase: CanIUse = CanIUse::default();
 }

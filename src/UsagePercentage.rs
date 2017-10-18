@@ -2,11 +2,16 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// A simple 'newtype' wrapper that represents a percentage
 #[derive(Deserialize, Debug, Copy, Clone)]
 pub struct UsagePercentage(f64);
 
 impl<I: Into<f64>> From<I> for UsagePercentage
 {
+	/// Converts from anything that can be represented as a f64 into a percentage.
+	/// Clamps values below zero (including negative zero and negative infinity) to positive zero.
+	/// Clamps NaN as positive zero.
+	/// Clamps values above one hundred (including positive infinity) to one hundred.
 	#[inline(always)]
 	fn from(value: I) -> Self
 	{
@@ -16,20 +21,29 @@ impl<I: Into<f64>> From<I> for UsagePercentage
 
 impl UsagePercentage
 {
+	/// Represents 0%
 	pub const Zero: Self = UsagePercentage(0.0);
 	
+	/// Represents the minimum, 0%; interchangeable with UsagePercentage::Zero
 	pub const Minimum: Self = UsagePercentage::Zero;
 	
+	/// Represents 100%
 	pub const OneHundred: Self = UsagePercentage(100.0);
 	
+	/// Represents the maximum, 100%; interchangeable with UsagePercentage::OneHundred
 	pub const Maximum: Self = UsagePercentage::OneHundred;
 	
+	/// Converts from anything that can be represented as a f64 into a percentage.
+	/// Clamps values below zero (including negative zero and negative infinity) to positive zero.
+	/// Clamps NaN as positive zero.
+	/// Clamps values above one hundred (including positive infinity) to one hundred.
 	#[inline(always)]
 	pub fn new(value: f64) -> Self
 	{
 		Self::clamp(value)
 	}
 	
+	/// Converts to a scalar, ie a percentage divided by 100
 	#[inline(always)]
 	pub fn to_scalar(self) -> f64
 	{
@@ -56,6 +70,7 @@ impl UsagePercentage
 
 impl PartialEq for UsagePercentage
 {
+	/// Partial Equality; total equality is also supported
 	#[inline(always)]
 	fn eq(&self, other: &Self) -> bool
 	{
@@ -69,6 +84,7 @@ impl Eq for UsagePercentage
 
 impl PartialOrd for UsagePercentage
 {
+	/// Partial comparison
 	#[inline(always)]
 	fn partial_cmp(&self, other: &Self) -> Option<Ordering>
 	{
@@ -78,6 +94,7 @@ impl PartialOrd for UsagePercentage
 
 impl Ord for UsagePercentage
 {
+	/// Total comparison; always succeeds
 	#[inline(always)]
 	fn cmp(&self, other: &Self) -> Ordering
 	{
@@ -87,6 +104,7 @@ impl Ord for UsagePercentage
 
 impl Hash for UsagePercentage
 {
+	/// Hash
 	#[inline(always)]
 	fn hash<H: Hasher>(&self, state: &mut H)
 	{
@@ -96,31 +114,17 @@ impl Hash for UsagePercentage
 
 impl Display for UsagePercentage
 {
+	/// Displays as a floating point value followed by a '%'
 	#[inline(always)]
 	fn fmt(&self, fmt: &mut Formatter) -> fmt::Result
 	{
-		<f64 as Display>::fmt(&self.0, fmt)
-	}
-}
-
-impl LowerExp for UsagePercentage
-{
-	fn fmt(&self, f: &mut Formatter) -> fmt::Result
-	{
-		<f64 as LowerExp>::fmt(&self.0, f)
-	}
-}
-
-impl UpperExp for UsagePercentage
-{
-	fn fmt(&self, f: &mut Formatter) -> fmt::Result
-	{
-		<f64 as UpperExp>::fmt(&self.0, f)
+		write!(fmt, "{}%", self.0)
 	}
 }
 
 impl Default for UsagePercentage
 {
+	/// Defaults to zero
 	#[inline(always)]
 	fn default() -> Self
 	{
@@ -132,6 +136,7 @@ impl Add<UsagePercentage> for UsagePercentage
 {
 	type Output = Self;
 	
+	/// Add
 	#[inline(always)]
 	fn add(self, rhs: Self) -> Self::Output
 	{
@@ -141,6 +146,7 @@ impl Add<UsagePercentage> for UsagePercentage
 
 impl AddAssign<UsagePercentage> for UsagePercentage
 {
+	/// Add in place
 	#[inline(always)]
 	fn add_assign(&mut self, rhs: Self)
 	{
@@ -152,6 +158,7 @@ impl Sub<UsagePercentage> for UsagePercentage
 {
 	type Output = Self;
 	
+	/// Subtract
 	#[inline(always)]
 	fn sub(self, rhs: Self) -> Self::Output
 	{
@@ -161,6 +168,7 @@ impl Sub<UsagePercentage> for UsagePercentage
 
 impl SubAssign<UsagePercentage> for UsagePercentage
 {
+	/// Subtract in place
 	#[inline(always)]
 	fn sub_assign(&mut self, rhs: Self)
 	{
@@ -172,6 +180,7 @@ impl Deref for UsagePercentage
 {
 	type Target = f64;
 	
+	/// Dereferences to f64
 	#[inline(always)]
 	fn deref(&self) -> &Self::Target
 	{

@@ -2,39 +2,43 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// An agent is effectively a browser. It is not a rendering engine, although it is closely related
 #[derive(Debug, Clone)]
 pub struct Agent<'a>
 {
 	eras: &'a Eras,
-	agentName: &'a AgentName,
-	agentDetail: &'a AgentDetail,
+	agent_name: &'a AgentName,
+	agent_detail: &'a AgentDetail,
 }
 
 impl<'a> Agent<'a>
 {
+	/// Agent name
 	#[inline(always)]
-	pub fn agentName(&self) -> &'a AgentName
+	pub fn agent_name(&self) -> &'a AgentName
 	{
-		self.agentName
+		self.agent_name
 	}
 	
+	/// Agent browser name
 	#[inline(always)]
-	pub fn agentDetailName(&self) -> &str
+	pub fn browser_name(&self) -> &str
 	{
-		self.agentDetail.name()
+		&self.agent_detail.name
 	}
 	
+	/// Agent detail abbreviated name, eg 'Chr.' for chrome
 	#[inline(always)]
-	pub fn abbreviatedName(&self) -> &str
+	pub fn abbreviated_name(&self) -> &str
 	{
-		self.agentDetail.abbreviatedName()
+		&self.agent_detail.abbreviated_name
 	}
 	
-	/// desktop or mobile agent
+	/// Is this a desktop or mobile agent?
 	#[inline(always)]
-	pub fn agentType(&self) -> AgentType
+	pub fn agent_type(&self) -> AgentType
 	{
-		self.agentDetail.agentType()
+		self.agent_detail.agent_type
 	}
 	
 	/// prefix to use for this particular version (lacks leading and trailing dash)
@@ -42,20 +46,51 @@ impl<'a> Agent<'a>
 	#[inline(always)]
 	pub fn prefix(&self, version: &Version) -> &'a Prefix
 	{
-		self.agentDetail.prefix(version)
+		match self.agent_detail.prefix_exceptions.get(version)
+		{
+			Some(prefix) => prefix,
+			None => &self.agent_detail.prefix,
+		}
 	}
 	
-	/// Multiply by 100 to get a percentage
+	/// global usage
 	#[inline(always)]
-	pub fn globalUsageFraction(&self, version: &Version) -> Option<f64>
+	pub fn global_usage(&self, version: &Version) -> Option<UsagePercentage>
 	{
-		self.agentDetail.globalUsageFraction(version)
+		self.agent_detail.usage_global.get(version).map(|value| *value)
 	}
 	
-	/// versions to eras; not super useful as eras aren't tied to dates, so to say 'e0' doesn't really define a point in time
+	/// versions to eras; not super useful as eras aren't tied to dates and so change the point in time they might be associated with with revisions of the caniuse.com database
 	#[inline(always)]
-	pub fn versionNearestToEra(&self, eraName: &EraName) -> Option<&'a Version>
+	pub fn versionNearestToEra(&'a self, eras: &Eras, eraName: &EraName) -> Option<&'a Version>
 	{
-		self.agentDetail.versionNearestToEra(self.eras, eraName)
+		let mut index = match eras.index(eraName)
+		{
+			None => if eraName.is_negative()
+			{
+				0
+			}
+			else
+			{
+				self.agent_detail.eras_to_versions.len() - 1
+			},
+			Some(index) => index,
+		};
+		
+		loop
+		{
+			match self.agent_detail.eras_to_versions.get(index).unwrap()
+			{
+				&Some(ref version) => return Some(version),
+				&None => if index == 0
+				{
+					return None;
+				}
+				else
+				{
+					index -=1;
+				}
+			}
+		}
 	}
 }
