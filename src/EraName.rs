@@ -4,7 +4,7 @@
 
 /// An EraName is a caniuse.com concept for modelling past, current and future browsers with a similar version.
 /// Not all browsers belong to any particular Era. Particularly so for older versions of Internet Explorer, which has had very few releases.
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct EraName(i64);
 
 impl<'de> Deserialize<'de> for EraName
@@ -44,6 +44,16 @@ impl<'de> Deserialize<'de> for EraName
 	}
 }
 
+impl Default for EraName
+{
+	/// Returns the current Era
+	#[inline(always)]
+	fn default() -> Self
+	{
+		Self::Current
+	}
+}
+
 impl EraName
 {
 	/// Returns the oldest known Era
@@ -54,13 +64,8 @@ impl EraName
 		canIUse.eras.oldest().expect("there ought to be at least one era").clone()
 	}
 	
-	/// Returns the current Era
-	/// Panics if the CanIUse database is missing the current Era; this should not be possible unless you're crafting your own input JSON.
-	#[inline(always)]
-	pub fn current<'a>(canIUse: &'a CanIUse) -> Self
-	{
-		canIUse.eras.has(EraName(0)).expect("there ought to be at a current era")
-	}
+	/// The current Era
+	pub const Current: EraName = EraName(0);
 	
 	/// Returns the youngest known Era; typically this is also that associated with Safari's Technology Preview so it is not normally an useful concept.
 	/// Panics if the CanIUse database has no Eras; this should not be possible unless you're crafting your own input JSON.

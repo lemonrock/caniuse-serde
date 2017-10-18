@@ -17,10 +17,16 @@
 //! Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
 
 
-#![deny(missing_docs)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
+#![deny(missing_copy_implementations)]
+#![deny(missing_debug_implementations)]
+#![deny(missing_docs)]
+#![deny(unstable_features)]
+#![deny(unused_extern_crates)]
+#![deny(unused_import_braces)]
+#![deny(unused_qualifications)]
 #![recursion_limit="1024"]
 
 

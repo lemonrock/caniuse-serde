@@ -113,7 +113,7 @@ impl CanIUse
 		{
 			type Value = u64;
 			
-			fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result
+			fn expecting(&self, formatter: &mut Formatter) -> fmt::Result
 			{
 				formatter.write_str("a positive integer")
 			}
@@ -197,5 +197,5 @@ impl CanIUse
 lazy_static!
 {
 	/// The up-to-date version of the caniuse.com database shipped embedded in this crate.
-   	pub static ref EmbeddedCanIUseDatabase: CanIUse = CanIUse::default();
+	#[derive(Debug)] pub static ref EmbeddedCanIUseDatabase: CanIUse = CanIUse::default();
 }

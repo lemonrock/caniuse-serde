@@ -3,6 +3,7 @@
 
 
 /// Represents details of support
+#[derive(Debug, Copy, Clone)]
 pub struct Support<'a>
 {
 	support_detail: &'a SupportDetail,
