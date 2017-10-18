@@ -3,6 +3,7 @@
 
 
 /// Represents the maturity of support in an agent
+#[allow(missing_docs)]
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum SupportMaturity
 {

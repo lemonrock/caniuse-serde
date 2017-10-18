@@ -3,6 +3,7 @@
 
 
 /// The name of this agent
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum AgentName
 {

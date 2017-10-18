@@ -3,6 +3,7 @@
 
 
 /// A ParentCategory is used in the caniuse.com UI. It is of limited use otherwise.
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum ParentCategory
 {

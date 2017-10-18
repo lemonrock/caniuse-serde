@@ -3,6 +3,7 @@
 
 
 /// One or more categories are associated with each Feature
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Category
 {

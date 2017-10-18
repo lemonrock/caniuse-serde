@@ -2,6 +2,7 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+/// A struct that exists to workaround Rust's lack (yet) of 'impl Trait'
 #[derive(Debug, Clone)]
 pub struct SupportRangeIterator<'a>
 {

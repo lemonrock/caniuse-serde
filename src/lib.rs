@@ -2,20 +2,27 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
+//! # caniuse-serde
+//!
+//! A Rust library crate for working with the caniuse.com database of Browser (agent) features and regional usage data
+//! Comes with a version if the database embedded, and can also be used with external copies (JSON files)
+//!
+//! To get started:-
+//! `extern crate caniuse_serde;`
+//! `use ::caniuse_serde::{EmbeddedCanIUseDatabase, AgentName, FeatureName}`
+//! Look up an agent's details:-
+//! `let agent: AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();`
+//! Look up a feature's details:-
+//! `let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();`
+//! Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
+
+
+#![deny(missing_docs)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 #![recursion_limit="1024"]
 
-
-///! To get started:-
-///! `extern crate caniuse_serde;`
-///! `use ::caniuse_serde::{EmbeddedCanIUseDatabase, AgentName, FeatureName}`
-///! Look up an agent's details:-
-///! let agent: AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();
-///! Look up a feature's details:-
-///! let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();
-///! Use the constants in `RegionalUsage` to get regional usage data.
 
 extern crate chrono;
 #[macro_use] extern crate lazy_static;
@@ -61,6 +68,10 @@ use ::url::Url;
 
 
 #[cfg(test)] mod systemTests;
+
+// Support for Agent regional, continental and world-wide usage by version
+// pub mod regional_usage;
+
 
 
 include!("Agent.rs");

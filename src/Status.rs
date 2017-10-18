@@ -3,6 +3,7 @@
 
 
 /// A Status reflects the 'standardisation' of a feature
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Status
 {
