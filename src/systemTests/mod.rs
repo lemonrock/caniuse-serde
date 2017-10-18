@@ -3,10 +3,17 @@
 
 
 use super::CanIUse;
+use super::regional_usage::RegionalUsage;
 
 
 #[test]
-fn test()
+fn can_i_use_default()
 {
 	CanIUse::default();
+}
+
+#[test]
+fn regional_usage_default()
+{
+	RegionalUsage::default();
 }

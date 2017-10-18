@@ -27,7 +27,7 @@ debug-assertions = false
 codegen-units = 1
 
 [dependencies]
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 lazy_static = "0.2"
 serde_derive = "^1.0.8"
 serde_json = { version = "^1.0.4", features = ["preserve_order"] }

@@ -75,8 +75,8 @@ use ::url::Url;
 
 #[cfg(test)] mod systemTests;
 
-// Support for Agent regional, continental and world-wide usage by version
-// pub mod regional_usage;
+/// Support for Agent regional, continental and world-wide usage by version
+pub mod regional_usage;
 
 
 
