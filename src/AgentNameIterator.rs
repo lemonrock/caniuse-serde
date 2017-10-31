@@ -2,18 +2,28 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
-use super::*;
-use ::chrono::naive::NaiveDate;
-use ::std::collections::BTreeMap;
-use ::std::collections::HashMap;
-use ::std::collections::HashSet;
-use ::std::collections::btree_map::Range;
-use ::std::collections::Bound;
-use ::std::fs::File;
-use ::std::io::Read;
-use ::std::path::Path;
-use ::std::str::FromStr;
+/// A struct that exists to workaround Rust's lack (yet) of 'impl Trait'
+#[derive(Debug, Clone)]
+pub struct AgentNameIterator<'a>(Keys<'a, AgentName, AgentDetail>);
 
+impl<'a> Iterator for AgentNameIterator<'a>
+{
+	type Item = &'a AgentName;
+	
+	/// Returns the next AgentName object.
+	#[inline(always)]
+	fn next(&mut self) -> Option<Self::Item>
+	{
+		self.0.next()
+	}
+}
 
-include!("RegionalUsage.rs");
-include!("YearMonth.rs");
+impl<'a> ExactSizeIterator for AgentNameIterator<'a>
+{
+	/// Returns the exact number of times the iterator will iterate.
+	#[inline(always)]
+	fn len(&self) -> usize
+	{
+		self.0.len()
+	}
+}

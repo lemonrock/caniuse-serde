@@ -29,9 +29,9 @@ impl FromStr for RegionalUsage
 	type Err = ::serde_json::error::Error;
 	
 	#[inline(always)]
-	fn from_str(canIUseRegionalUsageDatabase: &str) -> Result<Self, Self::Err>
+	fn from_str(regional_usage_database_json: &str) -> Result<Self, Self::Err>
 	{
-		::serde_json::from_str(canIUseRegionalUsageDatabase)
+		::serde_json::from_str(regional_usage_database_json)
 	}
 }
 
@@ -39,23 +39,23 @@ impl RegionalUsage
 {
 	/// Deserialize regional usage data from a file path to a `data.json` file.
 	#[inline(always)]
-	pub fn from_path<P: AsRef<Path>>(canIUseRegionalUsageDatabaseFilePath: P) -> Result<Self, Box<::std::error::Error>>
+	pub fn from_path<P: AsRef<Path>>(regional_usage_database_file_path: P) -> Result<Self, Box<::std::error::Error>>
 	{
-		Self::from_reader(File::open(canIUseRegionalUsageDatabaseFilePath)?)
+		Self::from_reader(File::open(regional_usage_database_file_path)?)
 	}
 	
 	/// Deserialize regional usage data from a readable stream of raw JSON bytes.
 	#[inline(always)]
-	pub fn from_reader<R: Read>(readerOfStreamOfCanIUseJsonBytes: R) -> Result<Self, Box<::std::error::Error>>
+	pub fn from_reader<R: Read>(reader_of_stream_of_regional_usage_database_json_bytes: R) -> Result<Self, Box<::std::error::Error>>
 	{
-		Ok(serde_json::from_reader(readerOfStreamOfCanIUseJsonBytes)?)
+		Ok(serde_json::from_reader(reader_of_stream_of_regional_usage_database_json_bytes)?)
 	}
 	
 	/// Deserialize regional usage data from a slice of raw JSON bytes.
 	#[inline(always)]
-	pub fn from_slice(rawCanIUseJsonBytes: &[u8]) -> Result<Self, ::serde_json::error::Error>
+	pub fn from_slice(regional_usage_database_json_byte: &[u8]) -> Result<Self, ::serde_json::error::Error>
 	{
-		Ok(serde_json::from_slice(rawCanIUseJsonBytes)?)
+		Ok(serde_json::from_slice(regional_usage_database_json_byte)?)
 	}
 	
 	/// ISO-like code.
@@ -72,26 +72,60 @@ impl RegionalUsage
 		&self.name
 	}
 	
-	/// Total usage; may not add up to 100% (eg for Andorra, adds up to about 95%).
+	/// Total usage; may not add up to 100% (eg for Andorra, AD, adds up to about 95%).
 	#[inline(always)]
 	pub fn total(&self) -> UsagePercentage
 	{
 		self.total
 	}
 	
-	/// Usage; returns None if agentName has no known usages.
+	/// Usage; returns None if agent_name has no known usages.
 	#[inline(always)]
-	pub fn usage(&self, agentName: &AgentName, lowerBound: Bound<&Version>, upperBound: Bound<&Version>) -> Option<Range<Version, Option<UsagePercentage>>>
+	pub fn usage(&self, agent_name: &AgentName, lower_bound: Bound<&Version>, upper_bound: Bound<&Version>) -> Option<Range<Version, Option<UsagePercentage>>>
 	{
-		match self.data.get(agentName)
+		match self.data.get(agent_name)
 		{
 			None => None,
-			Some(entry) => Some(entry.range((lowerBound, upperBound)))
+			Some(entry) => Some(entry.range((lower_bound, upper_bound)))
 		}
+	}
+	
+	/// Find matching values.
+	/// For example the closure `|_agentName, _version, usagePercentage, _agentType| usagePercentage > UsagePercentage::new(0.05)` will match all versions of all user agents which are used by more than 5% of this region's users.
+	/// Internal values with an invalid or unknown version, or a missing usage percentage (ie bad data), are never matched.
+	/// A HashSet is returned to allow combination of multiple queries as unions (ie 'or').
+	#[inline(always)]
+	pub fn query<'a, Matcher: Fn(&'a AgentName, &'a Version, UsagePercentage, AgentType) -> bool>(&'a self, can_i_use: &'a CanIUse, matcher: Matcher) -> HashSet<(&'a AgentName, &'a Version)>
+	{
+		let mut result = HashSet::new();
+		for agentName in can_i_use.known_agent_names()
+		{
+			let agent = can_i_use.agent(agentName).expect("is from known_agent_names() so must exist");
+			let agent_type = agent.agent_type();
+			
+			if let Some(entry) = self.data.get(agentName)
+			{
+				for (version, optionalUsagePercentage) in entry.iter()
+				{
+					if !version.is_invalid_or_unknown()
+					{
+						if let &Some(versionUsagePercentage) = optionalUsagePercentage
+						{
+							if matcher(agentName, version, versionUsagePercentage, agent_type)
+							{
+								result.insert((agentName, version));
+							}
+						}
+					}
+				}
+			}
+		}
+		result
 	}
 }
 
-lazy_static! {
+lazy_static!
+{
 	/// Embedded world-wide agent usage database.
 	#[derive(Debug)] pub static ref WorldWide: RegionalUsage = RegionalUsage::default();
 

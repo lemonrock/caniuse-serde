@@ -15,6 +15,62 @@
 //! Look up a feature's details:-
 //! `let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();`
 //! Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
+//! To replicate the functionality of 'browserlist', use the `query()` method on RegionalUsage
+//!
+//! ## A strategy for using the caniuse database with [browserlist](https://github.com/ai/browserslist) like behaviour
+//! The concept of version is differently understood by the browser vendors (eg IE vs Chrome, say), and so just saying 'last 2 versions' isn't particularly useful.
+//! In practice, a combination of selection rules is needed to identify a set of browser and browser versions to support, using the data in the database. These selection rules are likely to be stable for months and years, but not in the long term.
+//!
+//! I've identified my own selection rules for a professional, international consultant's website written in English with translations to Spanish, French and Italian. I've added this as code to this crate as a test to make sure that the API I've written around the caniuse.com database is actually usable.
+//!
+//! ### My selection rules
+//! 1. Obsolete Browsers still in use
+//! 	- We need to support the last version of these until its percentage usage falls below X%
+//! 	- The percentage usage should be for a sub-set of the world (ie target audience continents or countries)
+//! 	- These browsers are:-
+//!			- IE (at version 11)
+//! 		- Blackberry Browser (at version 10)
+//! 		- IE Mobile (MS has dropped Windows Phone)
+//! 2. Browsers with major change of rendering engine
+//! 	- This effectively makes the last version with the old rendering engine obsolete
+//! 	- Rules as for Obsolete Browsers, but selection needs to be aware that there are 'later' versions
+//! 	- These browsers are:-
+//!  		- Android Browser (at 4.4.4)
+//!			- Opera with Presto
+//! 3. Automatically Updated Browsers
+//! 	- These browsers have short-lived, sub-yearly versions and so a simple 'last X versions' rule is sufficient
+//!  	- X can be the same for all browsers
+//! 	- Using a percentage isn't wise as usage of each version will change rapidly (from near zero to a few percentage points, then to near zero again), and certainly likely to change more rapidly than static website rebuilds
+//! 	- These browsers are:-
+//! 		- Firefox
+//! 		- Safari
+//! 		- Microsoft Edge
+//! 		- Chrome
+//! 		- Opera with Webkit Rendering Engine
+//! 4. Long-Term Releases of Automatically Updated Browsers
+//! 	- These browsers have occasional long-term releases which are intended to be supported for a year or more
+//! 	- Usage percentages for these may be very low globally, and they may be 9 or more release versions 'out-of-date', but they represent an important audience
+//! 	- In practice the length of time each long term release is supported for changes with each release, even though vendors have 'long term release policies'
+//!		- This is because policies change in the long interval between long-term releases
+//! 	- These browsers are problematic to identify as the caniuse.com database omits them
+//! 	- Some long-term release versions differ slightly in supported features, particularly those of a more experimental nature, to their related short-term release cousins (even though they may share the same major version number)
+//!		- For Firefox, ESR releases are supposedly for one year (actually, 54 weeks, '9-cycles', with a 12-week ('2-cycle') overlap between releases (a cycle is a Firefox release cycle, typically 6 weeks), but, as always for these sorts of releases, the policy has changed several times.
+//! 	- These browsers are:-
+//! 		- Firefox
+//! 5. Regionally significant, occasionally automatically updated browsers
+//! 	- Support of these browsers is particularly important for the Indian and Asian markets
+//! 	- Many cheaper smart phones come with them (I've used them, too)
+//! 	- Vendors frequently don't upgrade old firmware installed versions and some older versions may persist and have higher usage for some time than newer ones
+//! 	- All of them currently are just more dated versions of the Webkit rendering engine
+//! 	- These browsers are probably best supported with a 'above X% rule', where X is for any version
+//! 	- These browsers are:-
+//! 		- UC Browser
+//! 		- Samsung Internet
+//! 		- QQ Browser
+//! 		- Baidu Browser
+//! 6. Very different from mainstream and unsupportable
+//! 	- Opera Mini is an excellent product, but unless one is explicitly targeting its users' demographic, it is not useful to support
+//! 	- If one is targeting its users demographic, its lack of modern features (making it the lowest common denominator) means website development would not make use of caniuse.com data; it's too different.
 
 
 #![allow(non_camel_case_types)]
@@ -32,6 +88,7 @@
 
 extern crate chrono;
 #[macro_use] extern crate lazy_static;
+#[macro_use] extern crate maplit;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate serde_json;
@@ -39,16 +96,21 @@ extern crate url;
 extern crate url_serde;
 
 
+use self::regional_usage::*;
 use ::chrono::prelude::*;
 use ::serde::de;
 use ::serde::de::Deserialize;
+use ::serde::de::DeserializeSeed;
 use ::serde::de::Deserializer;
 use ::serde::de::MapAccess;
+use ::serde::de::SeqAccess;
 use ::serde::de::Visitor;
+use ::std::collections::Bound;
 use ::std::collections::BTreeMap;
 use ::std::collections::HashMap;
+use ::std::collections::HashSet;
+use ::std::collections::hash_map::Keys;
 use ::std::collections::btree_map::Range;
-use ::std::collections::Bound;
 use ::std::cmp::Ordering;
 use ::std::cmp::Eq;
 use ::std::cmp::Ord;
@@ -62,6 +124,7 @@ use ::std::hash::Hash;
 use ::std::hash::Hasher;
 use ::std::io::Read;
 use ::std::iter::DoubleEndedIterator;
+use ::std::iter::ExactSizeIterator;
 use ::std::iter::Iterator;
 use ::std::ops::Add;
 use ::std::ops::AddAssign;
@@ -83,23 +146,26 @@ pub mod regional_usage;
 include!("Agent.rs");
 include!("AgentDetail.rs");
 include!("AgentName.rs");
+include!("AgentNameIterator.rs");
 include!("AgentType.rs");
 include!("Bug.rs");
 include!("CanIUse.rs");
 include!("Category.rs");
-include!("Eras.rs");
-include!("EraName.rs");
 include!("Feature.rs");
 include!("FeatureDetail.rs");
 include!("FeatureName.rs");
+include!("FeatureNameIterator.rs");
 include!("Link.rs");
 include!("ParentCategory.rs");
+include!("ParentCategoryIterator.rs");
 include!("Prefix.rs");
 include!("Status.rs");
+include!("StatusIterator.rs");
 include!("Support.rs");
 include!("SupportDetail.rs");
 include!("SupportRangeIterator.rs");
 include!("SupportMaturity.rs");
 include!("UsagePercentage.rs");
 include!("Version.rs");
+include!("VersionDetail.rs");
 include!("VersionPart.rs");

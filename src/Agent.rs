@@ -6,7 +6,6 @@
 #[derive(Debug, Clone)]
 pub struct Agent<'a>
 {
-	eras: &'a Eras,
 	agent_name: &'a AgentName,
 	agent_detail: &'a AgentDetail,
 }
@@ -34,13 +33,6 @@ impl<'a> Agent<'a>
 		&self.agent_detail.abbreviated_name
 	}
 	
-	/// Is this a desktop or mobile agent?
-	#[inline(always)]
-	pub fn agent_type(&self) -> AgentType
-	{
-		self.agent_detail.agent_type
-	}
-	
 	/// prefix to use for this particular version (lacks leading and trailing dash)
 	/// varies per version only for legacy Opera using the Presto rendering engine (from -webkit- to -o-)
 	#[inline(always)]
@@ -53,44 +45,41 @@ impl<'a> Agent<'a>
 		}
 	}
 	
-	/// global usage
+	/// Is this a desktop or mobile agent?
+	#[inline(always)]
+	pub fn agent_type(&self) -> AgentType
+	{
+		self.agent_detail.agent_type
+	}
+	
+	/// Global usage; differs from `VersionDetail.global_usage()` **and** from `RegionalUsage::WorldWide`.
+	/// It is recommended to use the values in `RegionalUsage::WorldWide` for consistency.
 	#[inline(always)]
 	pub fn global_usage(&self, version: &Version) -> Option<UsagePercentage>
 	{
 		self.agent_detail.usage_global.get(version).map(|value| *value)
 	}
 	
-	/// versions to eras; not super useful as eras aren't tied to dates and so change the point in time they might be associated with with revisions of the caniuse.com database
+	/// Details of every known version.
 	#[inline(always)]
-	pub fn versionNearestToEra(&'a self, eras: &Eras, eraName: &EraName) -> Option<&'a Version>
+	pub fn version_details(&'a self) -> &'a BTreeMap<Version, VersionDetail>
 	{
-		let mut index = match eras.index(eraName)
-		{
-			None => if eraName.is_negative()
-			{
-				0
-			}
-			else
-			{
-				self.agent_detail.eras_to_versions.len() - 1
-			},
-			Some(index) => index,
-		};
-		
-		loop
-		{
-			match self.agent_detail.eras_to_versions.get(index).unwrap()
-			{
-				&Some(ref version) => return Some(version),
-				&None => if index == 0
-				{
-					return None;
-				}
-				else
-				{
-					index -=1;
-				}
-			}
-		}
+		&self.agent_detail.version_list
+	}
+	
+	/// Current version as of `CanIUse.last_updated()`.
+	#[inline(always)]
+	pub fn current_version(&'a self) -> &'a Version
+	{
+		&self.agent_detail.current_version
+	}
+	
+	/// Historic prefixes.
+	/// Only currently supplied for Opera Presto versions.
+	/// Duplicated in `version_details()`
+	#[inline(always)]
+	pub fn prefix_exceptions(&'a self) -> &'a BTreeMap<Version, Prefix>
+	{
+		&self.agent_detail.prefix_exceptions
 	}
 }

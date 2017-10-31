@@ -65,7 +65,7 @@ impl Version
 {
 	/// Special method to construct a version representing the Opera (Presto) 9.5-9.6 range
 	#[inline(always)]
-	pub fn opera9Dot5Or9Dot6() -> Version
+	pub fn opera_9_dot_5_or_9_dot_6() -> Self
 	{
 		use self::VersionPart::*;
 		Version(Number(9), vec![Number(5)])
@@ -73,7 +73,7 @@ impl Version
 	
 	/// Special method to construct a version representing the Opera (Presto) 10.0-10.1 range
 	#[inline(always)]
-	pub fn opera10Dot0Or10Dot1() -> Version
+	pub fn opera_10_dot_0_or_10_dot_1() -> Self
 	{
 		use self::VersionPart::*;
 		Version(Number(10), vec![Number(0)])
@@ -81,9 +81,30 @@ impl Version
 	
 	/// Special method to construct a version representing the Safari TP version
 	#[inline(always)]
-	pub fn safariTechnologyPreview() -> Version
+	pub fn safari_technology_preview() -> Self
 	{
 		Version(VersionPart::TechnologyPreview, vec![])
+	}
+	
+	/// Special method to construct a Version that only represents a major version, eg 10
+	#[inline(always)]
+	pub fn major(major_version: u64) -> Self
+	{
+		Version(VersionPart::Number(major_version), vec![])
+	}
+	
+	/// Special method to construct a Version that represents a major-minor version, eg 12.1
+	#[inline(always)]
+	pub fn major_minor(major_version: u64, minor_version: u64) -> Self
+	{
+		Version(VersionPart::Number(major_version), vec![VersionPart::Number(minor_version)])
+	}
+	
+	/// Special method to construct a Version that represents a major-minor-revision version, eg 4.5.6
+	#[inline(always)]
+	pub fn major_minor_revision(major_version: u64, minor_version: u64, revision_version: u64) -> Self
+	{
+		Version(VersionPart::Number(major_version), vec![VersionPart::Number(minor_version), VersionPart::Number(revision_version)])
 	}
 	
 	/// Is this version the Safari Technology Preview?
@@ -117,9 +138,9 @@ impl Version
 		// Specialized logic to handle legacy Opera Presto ranges and Safari Technology Preview
 		match v
 		{
-			"9.5-9.6" => return Self::opera9Dot5Or9Dot6(),
-			"10.0-10.1" => return Self::opera10Dot0Or10Dot1(),
-			"TP" => return Self::safariTechnologyPreview(),
+			"9.5-9.6" => return Self::opera_9_dot_5_or_9_dot_6(),
+			"10.0-10.1" => return Self::opera_10_dot_0_or_10_dot_1(),
+			"TP" => return Self::safari_technology_preview(),
 			_ => (),
 		}
 		

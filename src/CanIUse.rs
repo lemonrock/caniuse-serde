@@ -7,10 +7,9 @@
 #[derive(Deserialize, Debug, Clone)]
 pub struct CanIUse
 {
-	eras: Eras,
 	agents: HashMap<AgentName, AgentDetail>,
 	statuses: HashMap<Status, String>,
-	#[serde(rename = "cats")] childCategories: HashMap<ParentCategory, Vec<Category>>,
+	#[serde(rename = "cats")] child_categories: HashMap<ParentCategory, Vec<Category>>,
 	#[serde(deserialize_with = "CanIUse::updated_deserialize")] updated: DateTime<Utc>,
 	#[serde(rename = "data")] features: HashMap<FeatureName, FeatureDetail>,
 }
@@ -21,7 +20,7 @@ impl Default for CanIUse
 	#[inline(always)]
 	fn default() -> Self
 	{
-		match include_str!("data.json").parse()
+		match include_str!("data-2.0.json").parse()
 		{
 			Err(error) => panic!("Invalid data embedded: {}", error),
 			Ok(canIUse) => canIUse
@@ -33,35 +32,35 @@ impl FromStr for CanIUse
 {
 	type Err = ::serde_json::error::Error;
 	
-	/// Deserialize a CanIUse database from a UTF-8 string representing the contents of a `data.json` file.
+	/// Deserialize a CanIUse database from a UTF-8 string representing the contents of a `data-2.0.json` file (typically in `fulldata-json/`).
 	#[inline(always)]
-	fn from_str(canIUseDatabaseJson: &str) -> Result<Self, Self::Err>
+	fn from_str(can_i_use_database_json: &str) -> Result<Self, Self::Err>
 	{
-		::serde_json::from_str(canIUseDatabaseJson)
+		::serde_json::from_str(can_i_use_database_json)
 	}
 }
 
 impl CanIUse
 {
-	/// Deserialize a CanIUse database from a file path to a `data.json` file.
+	/// Deserialize a CanIUse database from a file path to a `data-2.0.json` file (typically in `fulldata-json/`).
 	#[inline(always)]
-	pub fn from_path<P: AsRef<Path>>(canIUseJsonDatabaseFilePath: P) -> Result<Self, Box<::std::error::Error>>
+	pub fn from_path<P: AsRef<Path>>(can_i_use_database_file_path: P) -> Result<Self, Box<::std::error::Error>>
 	{
-		Self::from_reader(File::open(canIUseJsonDatabaseFilePath)?)
+		Self::from_reader(File::open(can_i_use_database_file_path)?)
 	}
 	
 	/// Deserialize a CanIUse database from a readable stream of raw JSON bytes.
 	#[inline(always)]
-	pub fn from_reader<R: Read>(readerOfStreamOfCanIUseJsonBytes: R) -> Result<Self, Box<::std::error::Error>>
+	pub fn from_reader<R: Read>(reader_of_stream_of_can_i_use_json_bytes: R) -> Result<Self, Box<::std::error::Error>>
 	{
-		Ok(serde_json::from_reader(readerOfStreamOfCanIUseJsonBytes)?)
+		Ok(serde_json::from_reader(reader_of_stream_of_can_i_use_json_bytes)?)
 	}
 	
 	/// Deserialize a CanIUse database from a slice of raw JSON bytes.
 	#[inline(always)]
-	pub fn from_slice(rawCanIUseJsonBytes: &[u8]) -> Result<Self, ::serde_json::error::Error>
+	pub fn from_slice(raw_can_i_use_json_bytes: &[u8]) -> Result<Self, ::serde_json::error::Error>
 	{
-		Ok(serde_json::from_slice(rawCanIUseJsonBytes)?)
+		Ok(serde_json::from_slice(raw_can_i_use_json_bytes)?)
 	}
 	
 	/// A timestamp of when this particular database was last updated.
@@ -71,12 +70,39 @@ impl CanIUse
 		self.updated
 	}
 	
+	/// An iterator over the AgentNames known in this caniuse.com database
+	#[inline(always)]
+	pub fn known_agent_names(&self) -> AgentNameIterator
+	{
+		AgentNameIterator(self.agents.keys())
+	}
+	
+	/// An iterator over the AgentNames known in this caniuse.com database
+	#[inline(always)]
+	pub fn known_statuses(&self) -> StatusIterator
+	{
+		StatusIterator(self.statuses.keys())
+	}
+	
+	/// An iterator over the AgentNames known in this caniuse.com database
+	#[inline(always)]
+	pub fn known_parent_categories(&self) -> ParentCategoryIterator
+	{
+		ParentCategoryIterator(self.child_categories.keys())
+	}
+	
+	/// An iterator over the AgentNames known in this caniuse.com database
+	#[inline(always)]
+	pub fn known_feature_names(&self) -> FeatureNameIterator
+	{
+		FeatureNameIterator(self.features.keys())
+	}
+	
 	#[inline(always)]
 	fn agent<'a>(&'a self, agent_name: &'a AgentName) -> Option<Agent<'a>>
 	{
 		self.agents.get(agent_name).map(|agent_detail| Agent
 		{
-			eras: &self.eras,
 			agent_name,
 			agent_detail,
 		})
@@ -101,7 +127,7 @@ impl CanIUse
 	#[inline(always)]
 	fn child_categories<'a>(&'a self, parentCategory: &ParentCategory) -> Option<&'a [Category]>
 	{
-		self.childCategories.get(parentCategory).map(|value| &value[..])
+		self.child_categories.get(parentCategory).map(|value| &value[..])
 	}
 	
 	#[inline(always)]

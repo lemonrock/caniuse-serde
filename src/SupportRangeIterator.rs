@@ -14,7 +14,7 @@ impl<'a> Iterator for SupportRangeIterator<'a>
 {
 	type Item = (&'a Version, Support<'a>);
 	
-	/// Returns the next Support object
+	/// Returns the next Support object.
 	#[inline(always)]
 	fn next(&mut self) -> Option<Self::Item>
 	{
@@ -25,7 +25,7 @@ impl<'a> Iterator for SupportRangeIterator<'a>
 
 impl<'a> DoubleEndedIterator for SupportRangeIterator<'a>
 {
-	/// Returns the previous Support object
+	/// Returns the previous Support object.
 	#[inline(always)]
 	fn next_back(&mut self) -> Option<Self::Item>
 	{
