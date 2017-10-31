@@ -212,7 +212,8 @@ impl AgentNameAndVersionSet
 	}
 	
 	/// Browsers which are regularly updated, automatically and so which do not 'hang around'.
-	/// These browsers have short-lived, sub-yearly versions and so a simple 'last X versions' rule is sufficient.
+	/// These browsers have short-lived, sub-yearly versions
+	/// They are probably best discovered by matching for all released versions after a specific release date (eg 2 years ago)
 	/// X can be the same for all browsers.
 	/// Using a percentage isn't wise as usage of each version will change rapidly (from near zero to a few percentage points, then to near zero again), and certainly likely to change more rapidly than static website rebuilds.
 	#[inline(always)]
@@ -258,7 +259,7 @@ impl AgentNameAndVersionSet
 	/// Support of these browsers is particularly important for the Indian and Asian markets.
 	/// Many cheaper smart phones come with them (I've used them, too).
 	/// Vendors frequently don't upgrade old firmware installed versions and some older versions may persist and have higher usage for some time than newer ones.
-	/// All of them currently are just more dated versions of the Webkit rendering engine.
+	/// All of them currently are just more dated versions of the Webkit rendering engine than Chrome.
 	/// These browsers are probably best supported with a 'above X% rule', where X is for any version.
 	#[inline(always)]
 	pub fn regionally_significant_occasionally_automatically_updated_browsers() -> HashSet<AgentName>

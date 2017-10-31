@@ -8,7 +8,7 @@
 pub struct VersionDetail
 {
 	global_usage: UsagePercentage,
-	release_date: DateTime<Utc>,
+	release_date: Option<DateTime<Utc>>,
 	era: i64,
 	prefix: Prefix,
 }
@@ -25,8 +25,9 @@ impl VersionDetail
 	
 	/// A timestamp of when this particular version was released.
 	/// It is likely that the hours, minutes and seconds represent false precision.
+	/// If the release_date is None, then ordinarily this version has not yet been released and `self.era()` should be greater than zero (0).
 	#[inline(always)]
-	pub fn release_date(&self) -> DateTime<Utc>
+	pub fn release_date(&self) -> Option<DateTime<Utc>>
 	{
 		self.release_date
 	}

@@ -110,7 +110,7 @@ impl AgentDetail
 					{
 						let mut version = None;
 						let mut global_usage = None;
-						let mut release_date = None;
+						let mut release_date: Option<Option<u64>> = None;
 						let mut era = None;
 						let mut prefix = None;
 						while let Some(field) = map.next_key()?
@@ -145,12 +145,19 @@ impl AgentDetail
 						}
 						let version = version.ok_or_else(|| SerdeError::missing_field("version"))?;
 						let global_usage = global_usage.ok_or_else(|| SerdeError::missing_field("global_usage"))?;
-						let release_date_u64: u64 = release_date.ok_or_else(|| SerdeError::missing_field("release_date"))?;
+						let release_date_u64_optional = release_date.ok_or_else(|| SerdeError::missing_field("release_date"))?;
 						let era = era.ok_or_else(|| SerdeError::missing_field("era"))?;
 						let prefix = prefix.ok_or_else(|| SerdeError::missing_field("prefix"))?;
 						
 						// Cast here is deliberate; we deliberately parse expecting a non-negative timestamp
-						let release_date = Utc.timestamp(release_date_u64 as i64, 0);
+						let release_date = if let Some(release_date_u64) = release_date_u64_optional
+						{
+							Some(Utc.timestamp(release_date_u64 as i64, 0))
+						}
+						else
+						{
+							None
+						};
 						
 						self.0.insert(version, VersionDetail
 						{
