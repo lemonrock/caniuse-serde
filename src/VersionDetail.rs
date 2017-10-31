@@ -10,7 +10,7 @@ pub struct VersionDetail
 	global_usage: UsagePercentage,
 	release_date: Option<DateTime<Utc>>,
 	era: i64,
-	prefix: Prefix,
+	prefix_override: Option<Prefix>,
 }
 
 impl VersionDetail
@@ -42,10 +42,10 @@ impl VersionDetail
 		self.era
 	}
 	
-	/// Prefix for CSS properties.
+	/// Override of prefix; only specified for Opera
 	#[inline(always)]
-	pub fn prefix<'a>(&'a self) -> &'a Prefix
+	pub fn prefix_override(&self) -> Option<&Prefix>
 	{
-		&self.prefix
+		self.prefix_override.as_ref()
 	}
 }

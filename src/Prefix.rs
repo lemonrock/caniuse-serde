@@ -37,50 +37,10 @@ impl<'de> Deserialize<'de> for Prefix
 	/// Deserialize using Serde
 	fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error>
 	{
-		struct PrefixVisitor;
-		
-		impl<'de> Visitor<'de> for PrefixVisitor
+		match deserializer.deserialize_str(PrefixVisitor)?
 		{
-			type Value = Prefix;
-			
-			fn expecting(&self, formatter: &mut Formatter) -> fmt::Result
-			{
-				formatter.write_str("a vendor prefix without leading or trailing hyphens")
-			}
-			
-			fn visit_str<E: de::Error>(self, v: &str) -> Result<Self::Value, E>
-			{
-				use self::Prefix::*;
-				
-				let result = match v
-				{
-					"o" => o,
-					"moz" => moz,
-					"webkit" => webkit,
-					"ms" => ms,
-					
-					_ => Unknown(v.to_owned()),
-				};
-				Ok(result)
-			}
-			
-			fn visit_string<E: de::Error>(self, v: String) -> Result<Self::Value, E>
-			{
-				use self::Prefix::*;
-				
-				let result = match &v[..]
-				{
-					"o" => o,
-					"moz" => moz,
-					"webkit" => webkit,
-					"ms" => ms,
-					
-					_ => Unknown(v),
-				};
-				Ok(result)
-			}
+			None => Ok(Prefix::Unknown("".to_owned())),
+			Some(value) => Ok(value),
 		}
-		
-		deserializer.deserialize_str(PrefixVisitor)
 	}
 }

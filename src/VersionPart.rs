@@ -13,6 +13,9 @@ enum VersionPart
 	/// Represents Safari's TP version; sorts after a number
 	TechnologyPreview,
 	
+	/// Represents Opera Mini's all versions
+	All,
+	
 	/// Represents an unknown version part, perhaps a hyphenated release candidate, beta, etc; sorts after a number, which may be inappropriate
 	Unknown(String),
 }

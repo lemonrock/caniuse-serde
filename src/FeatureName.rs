@@ -46,8 +46,8 @@ impl FeatureName
 	/// Given a feature name and the CanIUse database, find the associated feature.
 	/// Returns None if this feature is not defined (this is typically either due to a typo or different versions of the caniuse.com database).
 	#[inline(always)]
-	pub fn feature<'a>(&'a self, canIUse: &'a CanIUse) -> Option<Feature<'a>>
+	pub fn feature<'a>(&'a self, can_i_use: &'a CanIUse) -> Option<Feature<'a>>
 	{
-		canIUse.feature(self)
+		can_i_use.feature(self)
 	}
 }

@@ -82,4 +82,20 @@ impl<'a> Agent<'a>
 	{
 		&self.agent_detail.prefix_exceptions
 	}
+	
+	/// Details of versions that are current or older
+	#[inline(always)]
+	pub fn version_details_for_current_and_older_versions(&'a self) -> Range<Version, VersionDetail>
+	{
+		use self::Bound::*;
+		
+		self.version_details().range((Unbounded, Included(self.current_version())))
+	}
+	
+	/// Details of version
+	#[inline(always)]
+	pub fn version_detail(&'a self, version: &Version) -> Option<&'a VersionDetail>
+	{
+		self.agent_detail.version_list.get(version)
+	}
 }

@@ -81,12 +81,26 @@ impl RegionalUsage
 	
 	/// Usage; returns None if agent_name has no known usages.
 	#[inline(always)]
-	pub fn usage(&self, agent_name: &AgentName, lower_bound: Bound<&Version>, upper_bound: Bound<&Version>) -> Option<Range<Version, Option<UsagePercentage>>>
+	pub fn usage<'a>(&'a self, agent_name: &AgentName, lower_bound: Bound<&Version>, upper_bound: Bound<&Version>) -> Option<Range<'a, Version, Option<UsagePercentage>>>
 	{
 		match self.data.get(agent_name)
 		{
 			None => None,
 			Some(entry) => Some(entry.range((lower_bound, upper_bound)))
+		}
+	}
+	
+	/// Usage for a specific version; returns None if agent_name does not exist
+	/// Returns Some(None) if agent_name has no entry for version
+	/// Returns Some(Some(None)) if agent_name has an entry, but the data in the caniuse.com regional database is 'null'
+	/// Returns Some(Some(&Some(usage_percentage)) if agent_name has an entry with valid data
+	#[inline(always)]
+	pub fn usage_of_version<'a>(&'a self, agent_name: &AgentName, version: &Version) -> Option<Option<&'a Option<UsagePercentage>>>
+	{
+		match self.data.get(agent_name)
+		{
+			None => None,
+			Some(entry) => Some(entry.get(version))
 		}
 	}
 	

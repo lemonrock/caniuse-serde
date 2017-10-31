@@ -112,7 +112,7 @@ impl AgentDetail
 						let mut global_usage = None;
 						let mut release_date: Option<Option<u64>> = None;
 						let mut era = None;
-						let mut prefix = None;
+						let mut prefix: Option<Option<Prefix>> = None;
 						while let Some(field) = map.next_key()?
 						{
 							match field
@@ -139,7 +139,20 @@ impl AgentDetail
 								
 								Field::prefix =>
 								{
-									prefix = Some(map.next_value()?);
+									struct PrefixSeed;
+									
+									impl<'de> DeserializeSeed<'de> for PrefixSeed
+									{
+										type Value = Option<Prefix>;
+										
+										#[inline(always)]
+										fn deserialize<D: Deserializer<'de>>(self, deserializer: D) -> Result<Self::Value, D::Error>
+										{
+											deserializer.deserialize_str(PrefixVisitor)
+										}
+									}
+									
+									prefix = Some(map.next_value_seed(PrefixSeed)?);
 								}
 							}
 						}
@@ -147,7 +160,7 @@ impl AgentDetail
 						let global_usage = global_usage.ok_or_else(|| SerdeError::missing_field("global_usage"))?;
 						let release_date_u64_optional = release_date.ok_or_else(|| SerdeError::missing_field("release_date"))?;
 						let era = era.ok_or_else(|| SerdeError::missing_field("era"))?;
-						let prefix = prefix.ok_or_else(|| SerdeError::missing_field("prefix"))?;
+						let prefix_override = prefix.ok_or_else(|| SerdeError::missing_field("prefix"))?;
 						
 						// Cast here is deliberate; we deliberately parse expecting a non-negative timestamp
 						let release_date = if let Some(release_date_u64) = release_date_u64_optional
@@ -164,7 +177,7 @@ impl AgentDetail
 							global_usage,
 							release_date,
 							era,
-							prefix,
+							prefix_override,
 						});
 						
 						Ok(())

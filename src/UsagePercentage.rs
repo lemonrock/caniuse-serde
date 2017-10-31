@@ -19,55 +19,6 @@ impl<I: Into<f64>> From<I> for UsagePercentage
 	}
 }
 
-impl UsagePercentage
-{
-	/// Represents 0%
-	pub const Zero: Self = UsagePercentage(0.0);
-	
-	/// Represents the minimum, 0%; interchangeable with UsagePercentage::Zero
-	pub const Minimum: Self = UsagePercentage::Zero;
-	
-	/// Represents 100%
-	pub const OneHundred: Self = UsagePercentage(100.0);
-	
-	/// Represents the maximum, 100%; interchangeable with UsagePercentage::OneHundred
-	pub const Maximum: Self = UsagePercentage::OneHundred;
-	
-	/// Converts from anything that can be represented as a f64 into a percentage.
-	/// Clamps values below zero (including negative zero and negative infinity) to positive zero.
-	/// Clamps NaN as positive zero.
-	/// Clamps values above one hundred (including positive infinity) to one hundred.
-	#[inline(always)]
-	pub fn new(value: f64) -> Self
-	{
-		Self::clamp(value)
-	}
-	
-	/// Converts to a scalar, ie a percentage divided by 100
-	#[inline(always)]
-	pub fn to_scalar(self) -> f64
-	{
-		self.0 / 100.0
-	}
-	
-	#[inline(always)]
-	fn clamp(value: f64) -> Self
-	{
-		if value.is_sign_negative() || value.is_nan()
-		{
-			UsagePercentage(0.0)
-		}
-		else if value.is_sign_positive() && (value > 100.0 || value.is_infinite())
-		{
-			UsagePercentage(100.0)
-		}
-		else
-		{
-			UsagePercentage(value)
-		}
-	}
-}
-
 impl PartialEq for UsagePercentage
 {
 	/// Partial Equality; total equality is also supported
@@ -185,5 +136,63 @@ impl Deref for UsagePercentage
 	fn deref(&self) -> &Self::Target
 	{
 		&self.0
+	}
+}
+
+impl UsagePercentage
+{
+	/// Represents 0%
+	pub const Zero: Self = UsagePercentage(0.0);
+	
+	/// Represents 1%
+	pub const One: Self = UsagePercentage(1.0);
+	
+	/// Represents 0.1%
+	pub const OnePerMille: Self = UsagePercentage(0.1);
+	
+	/// Represents 0.01%
+	pub const OneBasisPoint: Self = UsagePercentage(0.01);
+	
+	/// Represents the minimum, 0%; interchangeable with UsagePercentage::Zero
+	pub const Minimum: Self = UsagePercentage::Zero;
+	
+	/// Represents 100%
+	pub const OneHundred: Self = UsagePercentage(100.0);
+	
+	/// Represents the maximum, 100%; interchangeable with UsagePercentage::OneHundred
+	pub const Maximum: Self = UsagePercentage::OneHundred;
+	
+	/// Converts from anything that can be represented as a f64 into a percentage.
+	/// Clamps values below zero (including negative zero and negative infinity) to positive zero.
+	/// Clamps NaN as positive zero.
+	/// Clamps values above one hundred (including positive infinity) to one hundred.
+	#[inline(always)]
+	pub fn new(value: f64) -> Self
+	{
+		Self::clamp(value)
+	}
+	
+	/// Converts to a scalar, ie a percentage divided by 100
+	#[inline(always)]
+	pub fn to_scalar(self) -> f64
+	{
+		self.0 / 100.0
+	}
+	
+	#[inline(always)]
+	fn clamp(value: f64) -> Self
+	{
+		if value.is_sign_negative() || value.is_nan()
+		{
+			UsagePercentage(0.0)
+		}
+		else if value.is_sign_positive() && (value > 100.0 || value.is_infinite())
+		{
+			UsagePercentage(100.0)
+		}
+		else
+		{
+			UsagePercentage(value)
+		}
 	}
 }

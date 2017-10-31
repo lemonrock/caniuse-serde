@@ -79,6 +79,13 @@ impl Version
 		Version(Number(10), vec![Number(0)])
 	}
 	
+	/// Special method to construct a version representing the Opera Mini all version
+	#[inline(always)]
+	pub fn opera_mini_all() -> Self
+	{
+		Version(VersionPart::All, vec![])
+	}
+	
 	/// Special method to construct a version representing the Safari TP version
 	#[inline(always)]
 	pub fn safari_technology_preview() -> Self
@@ -141,6 +148,7 @@ impl Version
 			"9.5-9.6" => return Self::opera_9_dot_5_or_9_dot_6(),
 			"10.0-10.1" => return Self::opera_10_dot_0_or_10_dot_1(),
 			"TP" => return Self::safari_technology_preview(),
+			"all" => return Self::opera_mini_all(),
 			_ => (),
 		}
 		

@@ -75,7 +75,7 @@ impl<'a> Feature<'a>
 		&self.feature_detail.notes
 	}
 	
-	/// implementations; returns None if agentName has no known usages.
+	/// implementations; returns None if agent_name has no known usages.
 	#[inline(always)]
 	pub fn implementations_by_agents(&'a self, agent_name: &AgentName, lower_bound: Bound<&Version>, upper_bound: Bound<&Version>) -> Option<SupportRangeIterator<'a>>
 	{
@@ -90,6 +90,30 @@ impl<'a> Feature<'a>
 					range: entry.range((lower_bound, upper_bound)),
 				}
 			),
+		}
+	}
+	
+	/// implementation; returns None if agent_name has no known usages.
+	/// returns Some(None) if agent_name exists but not for the version.
+	/// returns Some(Some(support) if agent_name exists and the version has known support
+	#[inline(always)]
+	pub fn implementation(&'a self, agent_name: &AgentName, version: &Version) -> Option<Option<Support<'a>>>
+	{
+		match self.feature_detail.implementations_by_agents.get(agent_name)
+		{
+			None => None,
+			Some(entry) =>
+			{
+				match entry.get(version)
+				{
+					None => Some(None),
+					Some(support_detail) => Some(Some(Support
+					{
+						support_detail,
+						feature: self,
+					}))
+				}
+			}
 		}
 	}
 	

@@ -21,7 +21,9 @@
 //! The concept of version is differently understood by the browser vendors (eg IE vs Chrome, say), and so just saying 'last 2 versions' isn't particularly useful.
 //! In practice, a combination of selection rules is needed to identify a set of browser and browser versions to support, using the data in the database. These selection rules are likely to be stable for months and years, but not in the long term.
 //!
-//! I've identified my own selection rules for a professional, international consultant's website written in English with translations to Spanish, French and Italian. I've added this as code to this crate as a test to make sure that the API I've written around the caniuse.com database is actually usable.
+//! I've identified my own selection rules for a professional, international consultant's website written in English with translations to Spanish, French and Italian. I've added this as code to this crate to make sure that the API I've written around the caniuse.com database is actually usable.
+//!
+//! To make use of my choices, use the `AgentNameAndVersionSet` struct.
 //!
 //! ### My selection rules
 //! 1. Obsolete Browsers still in use
@@ -40,7 +42,6 @@
 //! 3. Automatically Updated Browsers
 //! 	- These browsers have short-lived, sub-yearly versions
 //! 	- They are probably best discovered by matching for all released versions after a specific release date (eg 2 years ago)
-//!  	- X can be the same for all browsers
 //! 	- Using a percentage isn't wise as usage of each version will change rapidly (from near zero to a few percentage points, then to near zero again), and certainly likely to change more rapidly than static website rebuilds
 //! 	- These browsers are:-
 //! 		- Firefox
@@ -98,6 +99,7 @@ extern crate url_serde;
 
 
 use self::regional_usage::*;
+use ::chrono::Duration;
 use ::chrono::prelude::*;
 use ::serde::de;
 use ::serde::de::Deserialize;
@@ -148,6 +150,7 @@ include!("Agent.rs");
 include!("AgentDetail.rs");
 include!("AgentName.rs");
 include!("AgentNameIterator.rs");
+include!("AgentNameAndVersionSet.rs");
 include!("AgentType.rs");
 include!("Bug.rs");
 include!("CanIUse.rs");
@@ -160,6 +163,7 @@ include!("Link.rs");
 include!("ParentCategory.rs");
 include!("ParentCategoryIterator.rs");
 include!("Prefix.rs");
+include!("PrefixVisitor.rs");
 include!("Status.rs");
 include!("StatusIterator.rs");
 include!("Support.rs");
