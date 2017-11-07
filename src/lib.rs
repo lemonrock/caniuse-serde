@@ -15,21 +15,21 @@
 //!
 //! ```
 //! extern crate caniuse_serde;
-//! use ::caniuse_serde::{EmbeddedCanIUseDatabase, AgentName, FeatureName}
+//! use ::caniuse_serde::{EmbeddedCanIUseDatabase, AgentName, FeatureName};
 //! ```
 //!
 //!
 //! ### To look up an agent's details
 //!
 //! ```
-//! let agent: AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();
+//! let agent = AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();
 //! ```
 //!
 //!
 //! ### To look up a feature's details
 //!
 //! ```
-//! let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();
+//! let feature = "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();
 //! ```
 //!
 //! ## Regional Usage
@@ -37,7 +37,7 @@
 //! * Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
 //! * To replicate the functionality of 'browserlist', use the `query()` method on RegionalUsage.
 //! * Or read below for a more useful approach.
-//! 
+//!
 //!
 //! ## A strategy for using the caniuse database with [browserlist](https://github.com/ai/browserslist) like behaviour
 //! The concept of version is differently understood by the browser vendors (eg IE vs Chrome, say), and so just saying 'last 2 versions' isn't particularly useful.
