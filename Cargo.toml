@@ -9,14 +9,14 @@ keywords = ["html", "css", "caniuse", "serde"]
 categories = ["database", "web-programming", "api-bindings"]
 license = "MIT"
 authors = ["Raphael Cohn <raphael.cohn@stormmq.com>"]
-documentation = "https://github.com/lemonrock/caniuse-serde/blob/master/README.md"
+documentation = "https://docs.rs/caniuse-serde/"
 homepage = "https://github.com/lemonrock/caniuse-serde"
 repository = "https://github.com/lemonrock/caniuse-serde.git"
 exclude = ["*"]
 include = ["README.md", "LICENSE", "COPYRIGHT", "src/**/*.rs", "src/**/*.json", "Cargo.toml", "rustfmt.toml", "clippy.toml"]
 readme = "README.md"
 publish = true
-version = "0.0.3"
+version = "0.0.4"
 
 [profile.release]
 opt-level = 3
@@ -30,8 +30,8 @@ codegen-units = 1
 chrono = { version = "0.4", features = ["serde"] }
 lazy_static = "0.2"
 maplit = "0.1.6"
-serde_derive = "^1.0.8"
-serde_json = { version = "^1.0.4", features = ["preserve_order"] }
-serde = "^1.0.8"
+serde_derive = "^1.0"
+serde_json = "^1.0"
+serde = "^1.0"
 url = "1.5.1"
 url_serde = "0.2.0"

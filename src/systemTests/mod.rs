@@ -37,9 +37,12 @@ fn sensible_rules_to_prefixes()
 	
 	let feature_name = FeatureName("css-focus-ring".to_owned());
 	let mut unique_prefixes = HashSet::new();
-	choices.prefixes_for_implementations_of_a_feature(&can_i_use, &feature_name, |prefix|
+	choices.support_for_a_feature(&can_i_use, &feature_name, |agent, version, support|
 	{
-		unique_prefixes.insert(prefix.clone());
+		if support.requires_prefix()
+		{
+			unique_prefixes.insert(agent.prefix(version).clone());
+		}
 	});
 	
 	assert!(unique_prefixes.contains(&Prefix::moz));

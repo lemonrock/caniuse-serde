@@ -3,8 +3,8 @@
 
 
 /// Version "3" and "3.0" are not considered equal; "3.0" is greater than "3".
-/// The legacy Opera (Presto) version strings "9.5-9.6" and "10.0-10.1" are converted to 9.5 and 10.0.
-/// Safari also has "TP" for its latest version, which is not stable across time and is converted to the VersionPart::TechnologyPreview.
+/// Opera and iOS Safari have hyphenation ranges of versions, eg "4.0-4.2". These are converted to a version matching the lower of the range, eg "4.0".
+/// Safari also has "TP" for its latest version, which is not stable across time and is converted to the VersionPart::TechnologyPreview, and Opera Mini just has "all"; it is effectively unversioned.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Version(VersionPart, Vec<VersionPart>);
 
@@ -63,22 +63,6 @@ impl FromStr for Version
 
 impl Version
 {
-	/// Special method to construct a version representing the Opera (Presto) 9.5-9.6 range
-	#[inline(always)]
-	pub fn opera_9_dot_5_or_9_dot_6() -> Self
-	{
-		use self::VersionPart::*;
-		Version(Number(9), vec![Number(5)])
-	}
-	
-	/// Special method to construct a version representing the Opera (Presto) 10.0-10.1 range
-	#[inline(always)]
-	pub fn opera_10_dot_0_or_10_dot_1() -> Self
-	{
-		use self::VersionPart::*;
-		Version(Number(10), vec![Number(0)])
-	}
-	
 	/// Special method to construct a version representing the Opera Mini all version
 	#[inline(always)]
 	pub fn opera_mini_all() -> Self
@@ -142,11 +126,15 @@ impl Version
 	{
 		use self::VersionPart::*;
 		
-		// Specialized logic to handle legacy Opera Presto ranges and Safari Technology Preview
+		// Handle version ranges used in Opera and iOS Safari
+		if let Some(index) = v.find('-')
+		{
+			return Self::parse(&v[..index]);
+		}
+		
+		// Specialized logic to handle legacy Opera Presto ranges, Safari Technology Preview, Opera Mini and iOS Safari
 		match v
 		{
-			"9.5-9.6" => return Self::opera_9_dot_5_or_9_dot_6(),
-			"10.0-10.1" => return Self::opera_10_dot_0_or_10_dot_1(),
 			"TP" => return Self::safari_technology_preview(),
 			"all" => return Self::opera_mini_all(),
 			_ => (),

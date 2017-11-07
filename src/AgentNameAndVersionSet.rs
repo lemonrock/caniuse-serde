@@ -10,7 +10,7 @@ impl Deref for AgentNameAndVersionSet
 {
 	type Target = HashSet<(AgentName, Version)>;
 	
-	/// Dereferences to f64
+	/// Dereferences to HashSet<(AgentName, Version)>
 	#[inline(always)]
 	fn deref(&self) -> &Self::Target
 	{
@@ -20,39 +20,22 @@ impl Deref for AgentNameAndVersionSet
 
 impl AgentNameAndVersionSet
 {
-	/// Find prefixes for implementations of a feature; useful for downstream applications, eg to find prefixes to autoprefix CSS with
+	/// Find support for implementations of a feature; useful for downstream applications, eg to find prefixes to autoprefix CSS with
 	#[inline(always)]
-	pub fn prefixes_for_implementations_of_a_feature<'a, F: FnMut(&Prefix)>(&self, can_i_use: &'a CanIUse, feature_name: &'a FeatureName, mut prefix_user: F)
+	pub fn support_for_a_feature<'a, F: FnMut(&Agent, &Version, &Support)>(&self, can_i_use: &'a CanIUse, feature_name: &'a FeatureName, mut support_user: F)
 	{
-		self.implementations_of_a_feature(can_i_use, feature_name, |agent, version, support|
+		self.feature(can_i_use, feature_name, |agent, version, support|
 		{
 			if let Some(Some(support)) = support
 			{
-				if support.requires_prefix()
-				{
-					if let Some(version_detail) = agent.version_detail(version)
-					{
-						if let Some(prefix) = version_detail.prefix_override()
-						{
-							prefix_user(prefix);
-						}
-						else
-						{
-							prefix_user(agent.prefix(version));
-						}
-					}
-					else
-					{
-						prefix_user(agent.prefix(version));
-					}
-				}
+				support_user(agent, version, support)
 			}
 		})
 	}
 	
-	/// Find out about implementations of a feature
+	/// Find out about a feature
 	#[inline(always)]
-	pub fn implementations_of_a_feature<'a, F: FnMut(&Agent, &Version, Option<Option<Support>>)>(&self, can_i_use: &'a CanIUse, feature_name: &'a FeatureName, mut feature_implementation_user: F)
+	pub fn feature<'a, F: FnMut(&Agent, &Version, Option<Option<Support>>)>(&self, can_i_use: &'a CanIUse, feature_name: &'a FeatureName, mut feature_implementation_user: F)
 	{
 		if let Some(feature) = feature_name.feature(can_i_use)
 		{
