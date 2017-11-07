@@ -26,7 +26,7 @@ impl AgentNameAndVersionSet
 	{
 		self.feature(can_i_use, feature_name, |agent, version, support|
 		{
-			if let Some(Some(support)) = support
+			if let Some(Some(ref support)) = support
 			{
 				support_user(agent, version, support)
 			}

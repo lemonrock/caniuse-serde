@@ -4,18 +4,40 @@
 
 //! # caniuse-serde
 //!
-//! A Rust library crate for working with the caniuse.com database of Browser (agent) features and regional usage data
-//! Comes with a version if the database embedded, and can also be used with external copies (JSON files)
+//! A Rust library crate for working with the <https://caniuse.com> database of browser (agent) features and regional usage data.
+//! Comes with a version if the database embedded, and can also be used with external copies (JSON files).
 //!
-//! To get started:-
-//! `extern crate caniuse_serde;`
-//! `use ::caniuse_serde::{EmbeddedCanIUseDatabase, AgentName, FeatureName}`
-//! Look up an agent's details:-
-//! `let agent: AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();`
-//! Look up a feature's details:-
-//! `let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();`
-//! Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
-//! To replicate the functionality of 'browserlist', use the `query()` method on RegionalUsage
+//!
+//! ## Getting Going
+//!
+//!
+//! ### To get started
+//!
+//! ```
+//! extern crate caniuse_serde;
+//! use ::caniuse_serde::{EmbeddedCanIUseDatabase, AgentName, FeatureName}
+//! ```
+//!
+//!
+//! ### To look up an agent's details
+//!
+//! ```
+//! let agent: AgentName::MozillaFirefox.agent(EmbeddedCanIUseDatabase).unwrap();
+//! ```
+//!
+//!
+//! ### To look up a feature's details
+//!
+//! ```
+//! let feature: "transform3d".into().feature(EmbeddedCanIUseDatabase).unwrap();
+//! ```
+//!
+//! ## Regional Usage
+//!
+//! * Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
+//! * To replicate the functionality of 'browserlist', use the `query()` method on RegionalUsage.
+//! * Or read below for a more useful approach.
+//! 
 //!
 //! ## A strategy for using the caniuse database with [browserlist](https://github.com/ai/browserslist) like behaviour
 //! The concept of version is differently understood by the browser vendors (eg IE vs Chrome, say), and so just saying 'last 2 versions' isn't particularly useful.
@@ -23,7 +45,41 @@
 //!
 //! I've identified my own selection rules for a professional, international consultant's website written in English with translations to Spanish, French and Italian. I've added this as code to this crate to make sure that the API I've written around the caniuse.com database is actually usable.
 //!
-//! To make use of my choices, use the `AgentNameAndVersionSet` struct.
+//!
+//! ### To make use of my choices, use the `AgentNameAndVersionSet` struct
+//!
+//! ```
+//! extern crate caniuse_serde;
+//! use ::caniuse_serde::*;
+//! use ::caniuse_serde::regional_usage::*;
+//!
+//! let can_i_use = CanIUse::default();
+//! let maximum_release_age_from_can_i_use_database_last_updated = Duration::weeks(54 + 12); // Firefox ESR release cycle + 12 weeks (2x cycles overlap)
+//! let minimum_usage_threshold = UsagePercentage::OnePerMille;
+//! let regional_usages = vec!
+//! [
+//! 	Asia.deref(),
+//! 	Europe.deref(),
+//! 	NorthAmerica.deref(),
+//! 	SouthAmerica.deref(),
+//! 	AU.deref(),
+//! 	NZ.deref(),
+//! ];
+//!
+//! let choices = AgentNameAndVersionSet::a_sensible_set_of_choices_for_an_international_website_in_multiple_languages(&can_i_use, maximum_release_age_from_can_i_use_database_last_updated, minimum_usage_threshold, &regional_usages);
+//!
+//! let feature_name = FeatureName("css-focus-ring".to_owned());
+//! let mut unique_prefixes = HashSet::new();
+//! choices.support_for_a_feature(&can_i_use, &feature_name, |agent, version, support| {
+//! 	if support.requires_prefix() {
+//! 		unique_prefixes.insert(agent.prefix(version).clone());
+//! 	}
+//! });
+//!
+//! assert!(unique_prefixes.contains(&Prefix::moz));
+//! assert_eq!(unique_prefixes.len(), 1);
+//! ```
+//!
 //!
 //! ### My selection rules
 //! 1. Obsolete Browsers still in use
