@@ -2,24 +2,30 @@
 // Copyright © 2017 The developers of caniuse-serde. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/lemonrock/caniuse-serde/master/COPYRIGHT.
 
 
-use super::*;
-use ::chrono::naive::NaiveDate;
-use ::std::collections::BTreeMap;
-use ::std::collections::HashMap;
-use ::std::collections::HashSet;
-use ::std::collections::btree_map::Range;
-use ::std::collections::Bound;
-use ::std::error::Error;
-use ::std::fmt;
-use ::std::fmt::Display;
-use ::std::fmt::Formatter;
-use ::std::fs::File;
-use ::std::io::Read;
-use ::std::path::Path;
-use ::std::str::FromStr;
+/// Represents the error that can occur when parsing a str to get a Regional Usages.
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct RegionalUsagesFromStrError;
 
+impl Error for RegionalUsagesFromStrError
+{
+	#[inline(always)]
+	fn description(&self) -> &str
+	{
+		"unknown caniuse ISO-like code"
+	}
+	
+	#[inline(always)]
+	fn cause(&self) -> Option<&Error>
+	{
+		None
+	}
+}
 
-include!("RegionalUsage.rs");
-include!("RegionalUsages.rs");
-include!("RegionalUsagesFromStrError.rs");
-include!("YearMonth.rs");
+impl Display for RegionalUsagesFromStrError
+{
+	#[inline(always)]
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result
+	{
+		write!(f, "{}", self.description())
+	}
+}

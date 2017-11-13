@@ -37,6 +37,7 @@
 //! * Use the constants in the `regional_usage` module to get regional, continental and world-wide usage data.
 //! * To replicate the functionality of 'browserlist', use the `query()` method on RegionalUsage.
 //! * Or read below for a more useful approach.
+//! * Use the enum `RegionalUsages` with the method `regional_usage()` to obtain a reference to an embedded RegionalUsage database.
 //!
 //!
 //! ## A strategy for using the caniuse database with [browserlist](https://github.com/ai/browserslist) like behaviour
@@ -46,27 +47,16 @@
 //! I've identified my own selection rules for a professional, international consultant's website written in English with translations to Spanish, French and Italian. I've added this as code to this crate to make sure that the API I've written around the caniuse.com database is actually usable.
 //!
 //!
-//! ### To make use of my choices, use the `AgentNameAndVersionSet` struct
+//! ### To make use of my choices
+//!
+//! The quickest way is with either `sensible_rules()` or `sensible_rules_default()`:-
 //!
 //! ```
 //! extern crate caniuse_serde;
 //! use ::caniuse_serde::*;
 //! use ::caniuse_serde::regional_usage::*;
 //!
-//! let can_i_use = CanIUse::default();
-//! let maximum_release_age_from_can_i_use_database_last_updated = Duration::weeks(54 + 12); // Firefox ESR release cycle + 12 weeks (2x cycles overlap)
-//! let minimum_usage_threshold = UsagePercentage::OnePerMille;
-//! let regional_usages = vec!
-//! [
-//! 	Asia.deref(),
-//! 	Europe.deref(),
-//! 	NorthAmerica.deref(),
-//! 	SouthAmerica.deref(),
-//! 	AU.deref(),
-//! 	NZ.deref(),
-//! ];
-//!
-//! let choices = AgentNameAndVersionSet::a_sensible_set_of_choices_for_an_international_website_in_multiple_languages(&can_i_use, maximum_release_age_from_can_i_use_database_last_updated, minimum_usage_threshold, &regional_usages);
+//! let (can_i_use, choices) = sensible_rules_default();
 //!
 //! let feature_name = FeatureName("css-focus-ring".to_owned());
 //! let mut unique_prefixes = HashSet::new();
@@ -197,7 +187,8 @@ use ::url::Url;
 
 #[cfg(test)] mod systemTests;
 
-/// Support for Agent regional, continental and world-wide usage by version
+/// Support for Agent regional, continental and world-wide usage by version.
+/// Use the `RegionalUsages` enum preferably.
 pub mod regional_usage;
 
 
@@ -220,6 +211,8 @@ include!("ParentCategory.rs");
 include!("ParentCategoryIterator.rs");
 include!("Prefix.rs");
 include!("PrefixVisitor.rs");
+include!("sensible_rules.rs");
+include!("sensible_rules_default.rs");
 include!("Status.rs");
 include!("StatusIterator.rs");
 include!("Support.rs");
