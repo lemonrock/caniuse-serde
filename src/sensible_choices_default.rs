@@ -4,7 +4,7 @@
 
 /// Obtain (CanIUse, AgentNameAndVersionSet) for, say, `autoprefix_stylesheet()` in the `css-autoprefix` crate.
 #[inline(always)]
-pub fn sensible_rules_default() -> (CanIUse, AgentNameAndVersionSet)
+pub fn sensible_choices_default() -> (CanIUse, AgentNameAndVersionSet)
 {
 	use ::regional_usage::RegionalUsages::*;
 	
@@ -19,5 +19,5 @@ pub fn sensible_rules_default() -> (CanIUse, AgentNameAndVersionSet)
 		AU.regional_usage(),
 		NZ.regional_usage(),
 	];
-	sensible_rules(maximum_release_age_from_can_i_use_database_last_updated, minimum_usage_threshold, &regional_usages)
+	sensible_choices(maximum_release_age_from_can_i_use_database_last_updated, minimum_usage_threshold, &regional_usages)
 }

@@ -4,7 +4,7 @@
 
 /// Obtain (CanIUse, AgentNameAndVersionSet) for, say, `autoprefix_stylesheet()` in the `css-autoprefix` crate.
 #[inline(always)]
-pub fn sensible_rules(maximum_release_age_from_can_i_use_database_last_updated_in_weeks: u16, minimum_usage_threshold: UsagePercentage, regional_usages: &[&RegionalUsage]) -> (CanIUse, AgentNameAndVersionSet)
+pub fn sensible_choices(maximum_release_age_from_can_i_use_database_last_updated_in_weeks: u16, minimum_usage_threshold: UsagePercentage, regional_usages: &[&RegionalUsage]) -> (CanIUse, AgentNameAndVersionSet)
 {
 	let can_i_use = CanIUse::default();
 	let maximum_release_age_from_can_i_use_database_last_updated = ::chrono::Duration::weeks(maximum_release_age_from_can_i_use_database_last_updated_in_weeks as i64);

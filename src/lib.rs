@@ -49,14 +49,14 @@
 //!
 //! ### To make use of my choices
 //!
-//! The quickest way is with either `sensible_rules()` or `sensible_rules_default()`:-
+//! The quickest way is with either `sensible_choices()` or `sensible_choices_default()`:-
 //!
 //! ```
 //! extern crate caniuse_serde;
 //! use ::caniuse_serde::*;
 //! use ::caniuse_serde::regional_usage::*;
 //!
-//! let (can_i_use, choices) = sensible_rules_default();
+//! let (can_i_use, choices) = sensible_choices_default();
 //!
 //! let feature_name = FeatureName("css-focus-ring".to_owned());
 //! let mut unique_prefixes = HashSet::new();
@@ -211,8 +211,8 @@ include!("ParentCategory.rs");
 include!("ParentCategoryIterator.rs");
 include!("Prefix.rs");
 include!("PrefixVisitor.rs");
-include!("sensible_rules.rs");
-include!("sensible_rules_default.rs");
+include!("sensible_choices.rs");
+include!("sensible_choices_default.rs");
 include!("Status.rs");
 include!("StatusIterator.rs");
 include!("Support.rs");
